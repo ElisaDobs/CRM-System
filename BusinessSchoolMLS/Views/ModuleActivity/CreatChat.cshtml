@@ -1,0 +1,207 @@
+﻿@using MRTD.Core.Common;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Create/Manage Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ModuleActivityBusinessComponent component = new ModuleActivityBusinessComponent();
+    var lst_active_chat = component.GetAllStudyUnitActive(Session.AppSession["ClientId"].ToString());
+}
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 style="color: #6d2829;">Create/Manage Chat</h4>
+</div>
+
+<div>
+    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-group">Create Chat</button>
+</div>
+<div>
+    @using (Html.BeginForm("CloseChat", "ModuleActivity", FormMethod.Post))
+    {
+        <input type="hidden" name="MemberID" id="MemberID" value="@ViewBag.MemGuid" />
+        <div class="table-responsive">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Unit Name</th>
+                        <th>Chat Name</th>
+                        <th>Close Chat</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var active_chat in lst_active_chat)
+                    {
+                        <tr>
+                            <td>
+                                @active_chat.ModuleName
+                            </td>
+                            <td>
+                                @active_chat.ChatName
+                            </td>
+                            <td>
+                                <input type="checkbox" name="CloseChat" value="@active_chat.ChatID" />
+                            </td>
+                            <td>
+                                @Html.ActionLink("Manage Chat", "ManageChat", "ModuleActivity", new { mid = ViewBag.MemGuid, cid = active_chat.ChatID })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+        <div style="width: 100%; text-align: center;">
+            <button type="submit" class="btn btn-default" style="width: 250px;" data-toggle="modal">Close Chat(s)</button>
+        </div>
+    }
+</div>
+
+<div id="create-group" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create/Edit Unit Chat</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("SaveChat", "ModuleActivity", FormMethod.Post))
+                {
+                    <input type="hidden" name="mid" id="mid" value="@ViewBag.MemGuid" />
+                    <div class="form-group">
+                        <label for="txtChatName">Chat Name</label>
+                        <input type="text" name="txtChatName" id="txtChatName" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="UnitID">Study Unit Name</label>
+                        <input type="hidden" name="UnitID" id="search_value" />
+                        <input type="text" id="search_text" class="form-control" autocomplete="off" />
+                    </div>
+                    <div class="form-group">
+                    </div>
+                    <div style="width: 100%; text-align: center;">
+                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+
+<script type="text/javascript">
+
+    function getLabelHeader(headers) {
+
+        var header_arr = new Array();
+
+        $.each(headers, function (key, value) {
+            header_arr.push({ Value: key, Text: value });
+        });
+
+        return header_arr
+    }
+
+    function contains(sarchedString, searchItem) {
+
+        if (sarchedString.toLowerCase().indexOf(searchItem.toLowerCase()) >= 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function autoComplete(currentCtrl, comparer, headers, jsondata) {
+
+        if ($(currentCtrl).val() != "") {
+
+            var search_value = $(currentCtrl).val();
+            $(currentCtrl).parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+
+            var lst_all_headers = getLabelHeader(headers),
+                div_autocomplete = $(document.createElement("div")),
+                tbl_autocomplete = $(document.createElement("table")),
+                tbl_autocomplete_header = $(document.createElement("thead")),
+                tbl_autocomplete_t_row = $(document.createElement("tr"));
+            div_autocomplete.addClass("auto-complete");
+            tbl_autocomplete.addClass("table");
+            tbl_autocomplete.css("width", "95%");
+            tbl_autocomplete.css("left", "2.5%");
+            tbl_autocomplete.css("position", "relative");
+            tbl_autocomplete_header.append(tbl_autocomplete_t_row);
+            for (var header in lst_all_headers) {
+                var row_th = $("<th>" + lst_all_headers[header].Text + "</th>");
+                tbl_autocomplete_t_row.append(row_th);
+            }
+
+            tbl_autocomplete.append(tbl_autocomplete_header);
+            div_autocomplete.css("width", $(currentCtrl).outerWidth() + "px");
+            div_autocomplete.append(tbl_autocomplete);
+
+            var tbl_body_autocomplete = $(document.createElement("tbody"));
+            var atleast_exist = false;
+            for (var row in jsondata) {
+
+                var tbl_row_autocomplete = $(document.createElement("tr")),
+                    data_row = getLabelHeader(jsondata[row]);
+
+                tbl_row_autocomplete.bind("mouseenter", function (e) {
+                    $(this).css("background-color", "silver");
+                    $(this).css("cursor", "pointer");
+                    $(this).bind("click", function () {
+                        var selected_row = this.getElementsByTagName("td");
+                        document.getElementById("search_value").value = $(selected_row[0]).text();
+                        document.getElementById("search_text").value = $(selected_row[2]).text();
+                        $(this).parent().parent().parent().parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+                    });
+                });
+
+                tbl_row_autocomplete.bind("mouseout", function (e) {
+                    $(this).css("background-color", "");
+                    $(this).unbind("click");
+                });
+                var is_campare = false;
+                var exist = false;
+                for (var key in data_row) {
+                    if (comparer == data_row[key].Value) {
+                        is_campare = contains(data_row[key].Text, search_value);
+                        if (is_campare == true) {
+                            exist = true;
+                        }
+                    }
+                    $("<td>" + data_row[key].Text + "</td>").appendTo(tbl_row_autocomplete);
+                }
+                if (exist == true) {
+                    atleast_exist = exist;
+                    tbl_body_autocomplete.append(tbl_row_autocomplete);
+                }
+            }
+            if (atleast_exist == true) {
+
+                tbl_body_autocomplete.appendTo(tbl_autocomplete);
+
+                $(currentCtrl).parent().append(div_autocomplete);
+            }
+        }
+        else {
+            $(currentCtrl).parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+        }
+    }
+
+    $(document).ready(function () {
+        $.getJSON("/SchoolFaculty/GetAllInstitutionModule?mid=" + document.getElementById("mid").value,
+            function (response) {
+                $("#search_text").bind("keyup", function (e) {
+                    var headers = { ID: "#", UnitID: "Unit ID", UnitName: "Unit Name" },
+                        comparer = "UnitName";
+                    autoComplete(this, comparer, headers, response);
+                });
+            });
+    });
+</script>

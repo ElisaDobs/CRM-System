@@ -1,0 +1,64 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Manage Unit Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ModuleActivityBusinessComponent component = new ModuleActivityBusinessComponent();
+    int ChatID = ViewBag.ChatID;
+    var lst_member_chats = component.GetAllMemberPerChatID(ChatID);
+}
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 style="color: #6d2829;">Manage Unit Chat - @lst_member_chats?.FirstOrDefault().ChatName</h4>
+</div>
+<div>
+    &nbsp;
+</div>
+<div>
+    @using (Html.BeginForm("RemoveFromChat", "ModuleActivity", FormMethod.Post))
+    {
+        <input type="hidden" name="MemberID" id="MemberID" value="@ViewBag.MemGuid" />
+        <input type="hidden" name="ChatID" id="ChatID" value="@ChatID" />
+        <div class="table-responsive">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Module Name</th>
+                        <th>Chat Name</th>
+                        <th>Remove From Chat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var active_chat in lst_member_chats)
+                    {
+                        <tr>
+                            <td>
+                                @active_chat.FullName
+                            </td>
+                            <td>
+                                @active_chat.ModuleName
+                            </td>
+                            <td>
+                                @active_chat.ChatName
+                            </td>
+                            <td>
+                                <input type="checkbox" name="RemoveFromChat" value="@active_chat.MemberID" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+        <div style="width: 100%; text-align: center;">
+            <button type="submit" class="btn btn-default" style="width: 250px;" data-toggle="modal">Remove From Chat(s)</button>
+        </div>
+    }
+</div>
+

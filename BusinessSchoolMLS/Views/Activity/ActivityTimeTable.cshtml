@@ -1,0 +1,71 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+@using MRTD.Core.Models;
+
+@{
+    ViewData["Title"] = "Activity TimeTable";
+    var mguid = ViewBag.MemGuid;
+    string activity_name = string.Empty;
+    activity_name = ViewBag.ActivityID == 1 ? "Assignment TimeTable" : ViewBag.ActivityID == 2 ? "Test TimeTable" : "Exam TimeTable";
+
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+    OnlineModuleActivityBusinessComponent onlineModuleActivityBusinessComponent = new OnlineModuleActivityBusinessComponent();
+    int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
+    List<ActivityTimeTableModel> all_activity_time_tables = onlineModuleActivityBusinessComponent.GetActivityTimeTableByMemberID(MemberID, ViewBag.ActivityID);
+}
+
+<dv>
+    &nbsp;
+</dv>
+<div>
+    <h2 style="color: #6d2829;">@activity_name</h2>
+</div>
+
+<div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit</th>
+                    <th>Academic Year</th>
+                    <th>Due Date</th>
+                    <th>Time</th>
+                    <th>Duration</th>
+                    <th>Pass Mark</th>
+                    <th>Total Mark</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var activity in all_activity_time_tables)
+                {
+                    <tr>
+                        <td>@activity.Course</td>
+                        <td>@activity.AcademicYear</td>
+                        <td>@DateTime.Parse(activity.DueDate).ToString("yyyy-MM-dd")</td>
+                        <td>@activity.Time</td>
+                        <td>@activity.Duration</td>
+                        <td>@activity.PassMark</td>
+                        <td>@activity.TotalMark</td>
+                        @if (@activity.IsOnline)
+                        {
+                            <td>@Html.ActionLink("online", "OnlineQuestionnaire", "OnlineQuestionnaire", new { mid = ViewBag.MemGuid, aid = activity.ModuleActivityID })</td>
+                        }
+                        else
+                        {
+                            if (ViewBag.ActivityID == 1)
+                            {
+
+                                <td>@Html.ActionLink("Upload", "ModuleActivitityUpload", "ModuleActivity", new { mid = ViewBag.MemGuid, maid = activity.ModuleActivityID })</td>
+                            }
+                            else
+                            {
+                                <td></td>
+
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

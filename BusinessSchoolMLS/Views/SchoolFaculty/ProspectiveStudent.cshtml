@@ -1,0 +1,213 @@
+﻿@using MRTD.Core.Common;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Programs Applicants";
+    string mguid = ViewBag.MemGuid;
+    var facultyComponent = new FacultyBusinessComponent();
+    var lst_all_prospective = facultyComponent.GetCurrentYearProspectiveStudentByFacultyID(Session.AppSession["ClientId"].ToString());
+    int num_row_per_page = 10, row_count = 1, page_counter = 1;
+    var num_pages = lst_all_prospective.Count() % num_row_per_page > 0 ? (int)(lst_all_prospective.Count() / num_row_per_page) + 1 : (int)(lst_all_prospective.Count() / num_row_per_page);
+}
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+<script type="text/javascript">
+
+    //Author            : Tsaleni Dobson Maswanganye
+    //Date              : 2018 - 06 - 13
+
+    var SortPaging = function (tblCtrl) {
+        this.tblCtrl = tblCtrl;
+    }
+
+    SortPaging.prototype = {
+        loadSortPaging: function () {
+            var obj = this;
+            obj.loadPagination();
+            obj.loadColumnSorting();
+        },
+        loadPagination: function () {
+            var obj = this;
+            $(".pagination > li").each(function (index) {
+                $(this).bind("click", function () {
+                    obj.showPage($(this.getElementsByTagName("span")).text());
+                    obj.activateActive($(this.getElementsByTagName("span")).text());
+                });
+            });
+            obj.showFirstHideRest();
+        },
+        activateActive: function (num) {
+            $(".pagination > li").each(function (index) {
+                if ($(this.getElementsByTagName("span")).text() == num) {
+                    $(this).addClass("active");
+                }
+                else {
+                    $(this).removeAttr("class");
+                }
+            });
+        },
+        showFirstHideRest: function () {
+            var obj = this;
+            obj.tblCtrl.find("tbody > tr").each(function (index) {
+                if ($(this).attr("pageIndex") == "1") {
+                    $(this).show();
+                }
+                else {
+                    $(this).hide();
+                }
+            });
+        },
+        showPage: function (pageIndex) {
+            var obj = this;
+            obj.tblCtrl.find("tbody > tr").each(function (index) {
+                if ($(this).attr("pageIndex") == pageIndex) {
+                    $(this).show();
+                }
+                else {
+                    $(this).hide();
+                }
+            });
+        },
+        loadColumnSorting: function () {
+            var obj = this;
+            obj.tblCtrl.find("thead > tr").each(function (index) {
+                $(this.getElementsByTagName("th")).bind("click", function () {
+                    obj.sortByColumnIndex($(this).attr("columnIndex"));
+                });
+            });
+        },
+        sortByColumnIndex: function (columIndex) {
+
+            var obj = this,
+                sort_tbl = document.getElementById(obj.tblCtrl.attr("id")).getElementsByTagName("tbody"),
+                rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            dir = "asc";
+
+            switching = true;
+
+            while (switching) {
+                switching = false;
+
+                rows = $(sort_tbl).find("tr").each(function (index) { return this; });
+
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[columIndex];
+                    y = rows[i + 1].getElementsByTagName("td")[columIndex];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        var paging_sorting = new SortPaging($(document.getElementById("tblPaging")));
+        paging_sorting.loadSortPaging();
+    });
+
+</script>
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 style="color: #6d2829;">Programs Applicants</h4>
+</div>
+
+<div>
+    <div class="table-responsive">
+        <table id="tblPaging" class="table" paging="@num_row_per_page">
+            <thead>
+                <tr>
+                    <th columnIndex="0" style="cursor: pointer;">First Name</th>
+                    <th columnIndex="1" style="cursor: pointer;">Last Name</th>
+                    <th columnIndex="2" style="cursor: pointer;">Contact No</th>
+                    <th columnIndex="3" style="cursor: pointer;">Student No</th>
+                    <th columnIndex="4" style="cursor: pointer;">Program</th>
+                    <th columnIndex="5" style="cursor: pointer;">Year</th>
+                    <th columnIndex="6" style="cursor: pointer;">Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var prospect in lst_all_prospective)
+                {
+                    if (page_counter == 1)
+                    {
+                        <tr pageIndex="@page_counter">
+                            <td>@prospect.FirstName</td>
+                            <td>@prospect.LastName</td>
+                            <td>@prospect.CellNo</td>
+                            <td>@prospect.StudentNumber</td>
+                            <td>@prospect.QualificationName</td>
+                            <td>@prospect.AcademicYear</td>
+                            <td>@prospect.ErollmentStatusName</td>
+                            <td>@Html.ActionLink("Action Application", "Prospective", "SchoolFaculty", new { mid = mguid, sid = prospect.MemberGuid })</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr pageIndex="@page_counter" style="display: none;">
+                            <td>@prospect.FirstName</td>
+                            <td>@prospect.LastName</td>
+                            <td>@prospect.CellNo</td>
+                            <td>@prospect.StudentNumber</td>
+                            <td>@prospect.QualificationName</td>
+                            <td>@prospect.AcademicYear</td>
+                            <td>@prospect.ErollmentStatusName</td>
+                            <td>@Html.ActionLink("Action Application", "Prospective", "SchoolFaculty", new { mid = mguid, sid = prospect.MemberGuid })</td>
+                        </tr>
+                    }
+                    if (row_count % num_row_per_page == 0)
+                    {
+                        page_counter++;
+                    }
+                    row_count++;
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="8" style="text-align: center;">
+                        <ul class="pagination">
+                            @for (int Count = 1; Count <= num_pages; Count++)
+                            {
+                                if (Count == 1)
+                                {
+                                    <li class="active"><span>@Count</span></li>
+                                }
+                                else
+                                {
+                                    <li><span>@Count</span></li>
+                                }
+
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+

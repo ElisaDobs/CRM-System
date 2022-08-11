@@ -1,0 +1,176 @@
+﻿@model MRTD.Core.Models.NewFeedModel;
+@using MRTD.Core.Common;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+@{
+    ViewData["Title"] = "Create News Feed";
+    string mguid = ViewBag.MemberID;
+    ModuleActivityBusinessComponent businessComponent = new ModuleActivityBusinessComponent();
+    var lst_news_feeds = businessComponent.GetAllNewsFeedByClientID(Session.AppSession["ClientId"].ToString());
+}
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
+
+    .tipp-label {
+        color: #377091;
+    }
+
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+    }
+
+    .tipp-calender {
+        width: 33%;
+        display: inline-block;
+    }
+
+    .tipp-body {
+        width: 100%;
+    }
+
+    .tipp-textarea-field {
+        width: 50%;
+        height: 400px;
+    }
+</style>
+<div class="tipp-container">
+    <div>
+        &nbsp;
+    </div>
+    <div class="tipp-top-heading">
+        <h4 class="tipp-header">Create News Feed</h4>
+    </div>
+    <div>
+        &nbsp;
+    </div>
+    <div>
+        &nbsp;
+    </div>
+    <div>
+        <div>
+            <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-module-feed">Create News Feed</button>
+        </div>
+    </div>
+    <div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Unit Name</th>
+                        <th>News Feed Title</th>
+                        <th>Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var feed in lst_news_feeds)
+                    {
+                        <tr>
+                            <td>@feed.FullName</td>
+                            <td>@feed.ModuleName</td>
+                            <td>@feed.FeedHeader</td>
+                            <td>@feed.DatetimeStamp.ToString("yyyy-MM-dd")</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="create-module-feed" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create News Feed</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("SaveNewsFeed", "ModuleActivity", FormMethod.Post))
+                {
+                    <input type="hidden" name="MemberID" value="@ViewBag.MemberID" />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ModuleID, new { @class = "tipp-label" })
+                        @Html.DropDownListFor(model => model.ModuleID, Model.ModuleList, new { @class = "form-control tipp-input-field" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FeedHeader, new { @class = "tipp-label" })
+                        @Html.TextBoxFor(model => model.FeedHeader, new { @class = "form-control tipp-input-field" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FeedText, new { @class = "tipp-label" })
+                        @Html.TextAreaFor(model => model.FeedText, new { @class = "form-control tipp-textarea-field" })
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-default tipp-btn-default" value="Create" />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

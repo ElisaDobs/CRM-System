@@ -1,0 +1,522 @@
+﻿@model MRTD.Core.Models.ApplicationMemberModel;
+@using MRTD.Core.Common;
+@{
+    ViewBag.Title = "Application";
+    string redirect = Session.AppSession["AjaxRedirect"].ToString();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Registration</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <!--<link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />-->
+    </environment>
+    <style type="text/css">
+        .tipp-header {
+            color: #6d2829;
+        }
+
+        .tipp-label {
+            color: #377091;
+        }
+
+        .tipp-input-field {
+            width: 85%;
+        }
+
+        .tipp-container {
+            width: 100%;
+            display: inline-block;
+        }
+
+        .tipp-left-align {
+            width: 15%;
+            display: inline-block;
+        }
+
+        .tipp-middle-align {
+            width: 60%;
+            display: inline-block;
+        }
+
+        .tipp-right-align {
+            width: 15%;
+            display: inline-block;
+        }
+
+        .tipp-error-message {
+            color: red;
+            width: 100%;
+            text-align: left;
+            display: none;
+        }
+
+        .tipp-btn-default {
+            width: 120px;
+            color: #6d2829;
+        }
+
+        .tipp-btn-container
+        {
+            width: 100%; 
+            left: 5%; 
+            position: relative; 
+            text-align: left;
+        }
+        .tipp-redirect-link {
+            color: #377091;
+        }
+
+        a {
+            color: #377091;
+        }
+        .tipp-logo
+        {
+            padding-top: 0px;
+            top: 5px; 
+            position: absolute;
+        }
+        .tipp-logo-botton-line
+        {
+            background-color: #377091; 
+            width: 100%; 
+            height: 10px
+        }
+    </style>
+</head>
+<body>
+    <div class="tipp-header">
+        <img src="~/tipp-academy-logo.png" width="160" height="45" />
+    </div>
+    <div class="tipp-logo-botton-line">
+        &nbsp;
+    </div>
+    <div class="container">
+        @using (Html.BeginForm("SubmitApplication", "Application", FormMethod.Post))
+        {
+            <input type="hidden" value="1" name="MemberTypeID" id="MemberTypeID" />
+            <input type="hidden" value="@Session.AppSession["ClientId"].ToString()" name="ClientID" id="ClientID" />
+            <input type="hidden" value="2" name="RoleID" id="RoleID" />
+            <h4 class="tipp-header">Registration Form</h4>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:20%">
+                    1 of 5 steps
+                </div>
+            </div>
+            <div style="width: 100%;">
+                <div id="personal-detail" style="width: 100%;">
+                    <div id="personal-header" class="tipp-header">
+                        PERSONAL DETAILS
+                    </div>
+                    <div style="width: 100%;">
+                        <div style="width: 100%; display: inline-block;">
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.FirstName, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control", validation = "required" })
+                            </div>
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.LastName, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.LastName, new { @class = "form-control", validation = "required" })
+                            </div>
+                        </div>
+                        <div style="width: 100%; display: inline-block;">
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.TitleID, new { @class="tipp-label"})
+                                @Html.DropDownListFor(model => model.TitleID, Model.Titles, new { @class = "form-control", validation = "select" })
+                            </div>
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.IDNo, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.IDNo, new { @class = "form-control", validation = "required" })
+                            </div>
+                        </div>
+                        <div style="width: 100%; display: inline-block;">
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.WorkTelNo, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.WorkTelNo, new { @class = "form-control", validation = "required" })
+                            </div>
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.HomeTelNo, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.HomeTelNo, new { @class = "form-control", validation = "required" })
+                            </div>
+                        </div>
+                        <div style="width: 100%; display: inline-block">
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.CellNo, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.CellNo, new { @class = "form-control", @tel = "tel", validation = "required" })
+                            </div>
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.EmailAddress, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.EmailAddress, new { @class = "form-control", validation = "required" })
+                            </div>
+                            <div style="width: 100%; display: inline-block">
+                                <div class="form-group" style="width: 40%; display: inline-block;">
+                                    @Html.LabelFor(model => model.PhysicalAddress, new { @class="tipp-label"})
+                                    @Html.TextBoxFor(model => model.PhysicalAddress, new { @class = "form-control", validation = "required" })
+                                </div>
+                                <div class="form-group" style="width: 40%; display: inline-block;">
+                                    @Html.LabelFor(model => model.IsSameAddress, new { @class="tipp-label"})
+                                    @Html.CheckBoxFor(model => model.IsSameAddress)
+                                </div>
+                            </div>
+                            <div style="width: 100%; display: inline-block">
+                                <div class="form-group" style="width: 40%; display: inline-block;">
+                                    @Html.LabelFor(model => model.PostalAddress, new { @class="tipp-label"})
+                                    @Html.TextBoxFor(model => model.PostalAddress, new { @class = "form-control", validation = "required" })
+                                </div>
+                                <div class="form-group" style="width: 40%; display: inline-block;">
+                                    @Html.LabelFor(model => model.Password, new { @class="tipp-label"})
+                                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", validation = "required" })
+                                </div>
+                            </div>
+                            <div style="width: 100%; display: inline-block">
+                                <div class="form-group" style="width: 40%; display: inline-block;">
+                                    @Html.LabelFor(model => model.ConfirmPassword, new { @class="tipp-label"})
+                                    @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control", validation = "required" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="entity" style="width: 100%;">
+                    <div id="entity-header" class="tipp-header">
+                        ENTITY DETAILS
+                    </div>
+                    <div style="width: 100%; display: inline-block;">
+                        <div class="form-group" style="width: 40%; display: inline-block;">
+                            @Html.LabelFor(model => model.NationID, new { @class="tipp-label"})
+                            @Html.DropDownListFor(model => model.NationID, Model.Nations, new { @class = "form-control", validation = "select" })
+                        </div>
+                        <div class="form-group" style="width: 40%; display: inline-block;">
+                            @Html.LabelFor(model => model.GenderID, new { @class="tipp-label"})
+                            @Html.DropDownListFor(model => model.GenderID, Model.Genders, new { @class = "form-control", validation = "select" })
+                        </div>
+                    </div>
+                    <div style="width: 100%; display: inline-block;">
+                        <div style="width: 40%; display: inline-block;">
+                            @Html.LabelFor(model => model.RaceID, new { @class="tipp-label"})
+                            @Html.DropDownListFor(model => model.RaceID, Model.Races, new { @class = "form-control", validation = "select" })
+                        </div>
+                        <div style="width: 40%; display: inline-block;">
+                            @Html.LabelFor(model => model.LanguageID, new { @class="tipp-label"})
+                            @Html.DropDownListFor(model => model.LanguageID, Model.Languages, new { @class = "form-control", validation = "select" })
+                        </div>
+                    </div>
+                    <div style="width: 100%; display: inline-block;">
+                        <div class="form-group" style="width: 40%; display: inline-block;">
+                            @Html.LabelFor(model => model.Disability, new { @class="tipp-label"})
+                            @Html.TextBoxFor(model => model.Disability, new { @class = "form-control", validation = "required" })
+                        </div>
+                        <div class="form-group" style="width: 40%; display: inline-block;">
+                            @Html.LabelFor(model => model.SpecialLearningRequirement, new { @class="tipp-label"})
+                            @Html.TextBoxFor(model => model.SpecialLearningRequirement, new { @class = "form-control", validation = "required" })
+                        </div>
+                    </div>
+                </div>
+                <div id="employment" style="width: 100%;">
+                    <div id="employment-header" class="tipp-header">
+                        EMPLOYMENT DETAILS
+                    </div>
+                    <div style="width: 100%; display: inline-block;">
+                        <div style="width: 100%; display: inline-block;">
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.Employer, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.Employer, new { @class = "form-control", validation = "required" })
+                            </div>
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.Department, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.Department, new { @class = "form-control", validation = "required" })
+                            </div>
+                        </div>
+                        <div style="width: 100%; display: inline-block;">
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.Occupation, new { @class="tipp-label"})
+                                @Html.TextBoxFor(model => model.Occupation, new { @class = "form-control", validation = "required" })
+                            </div>
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.HighQualID, new { @class="tipp-label"})
+                                @Html.DropDownListFor(model => model.HighQualID, Model.HighestQualifications, new { @class = "form-control", validation = "select" })
+                            </div>
+                        </div>
+                        <div style="width: 100%; display: inline-block;">
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.FacultyID, new { @class="tipp-label"})
+                                @Html.DropDownListFor(model => model.FacultyID, Model.SchoolFaculties, new { @class = "form-control", validation = "select" })
+                            </div>
+                            <div class="form-group" style="width: 40%; display: inline-block;">
+                                @Html.LabelFor(model => model.QualificationID, new { @class="tipp-label"})
+                                <select id="QualificationID" name="QualificationID" class="form-control" validation="select">
+                                    <option value="0"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group tipp-btn-container">
+                <input type="submit" value="Submit" class="btn btn-default tipp-btn-default" />
+            </div>
+        }
+    </div>
+    <script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /*
+     Author Name :     Tsaleni Dobson Maswanganye
+     Date        :     2018 - 07 - 06
+     Description :     Validate madatory fields
+*/
+
+            var SelectField = function (selectCtrl) {
+                this.selectCtrl = selectCtrl;
+                this.attach("change");
+            };
+
+            SelectField.prototype = {
+                attach: function (e) {
+                    var obj = this;
+                    if (e === "change") {
+                        obj.selectCtrl.bind(e, function () {
+                            obj.selectCtrl.parent().find("span").remove();
+                        });
+                    }
+                },
+                validate: function () {
+                    var obj = this;
+                    if (obj.selectCtrl.find("option:selected").val() === "0") {
+                        obj.selectCtrl.parent().find("span").remove();
+                        obj.selectCtrl.parent().find("label").each(function () {
+                            $("<span style='color: red;'> * required</span>").appendTo($(this));
+                        });
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+            };
+
+            var RequiredField = function (requiredCtrl) {
+                this.requiredCtrl = requiredCtrl;
+                this.attach("keyup");
+            };
+
+            RequiredField.prototype = {
+                validate: function () {
+                    var obj = this;
+                    if (obj.requiredCtrl.val() === "") {
+                        obj.requiredCtrl.parent().find("span").remove();
+                        obj.requiredCtrl.parent().find("label").each(function (index) {
+                            $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                        });
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                attach: function (e) {
+                    var obj = this;
+                    if (e === "keyup") {
+                        return obj.requiredCtrl.bind(e, function () {
+                            obj.requiredCtrl.parent().find("span").remove();
+                        });
+                    }
+                }
+            };
+
+            var RequiredNumberField = function (requiredNumberCtrl) {
+                this.requiredNumberCtrl = requiredNumberCtrl;
+                this.attach("keyup");
+            };
+
+            RequiredNumberField.prototype = {
+                validate: function () {
+                    var obj = this;
+                    if (obj.requiredNumberCtrl.val() === "0") {
+                        obj.requiredNumberCtrl.parent().find("span").remove();
+                        obj.requiredNumberCtrl.parent().find("label").each(function (index) {
+                            $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                        });
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                attach: function (e) {
+                    var obj = this;
+                    if (e === "keyup") {
+                        return obj.requiredNumberCtrl.bind(e, function () {
+                            obj.requiredNumberCtrl.parent().find("span").remove();
+                        });
+                    }
+                }
+            };
+
+            var RequiredDateField = function (requiredDateCtrl) {
+                this.requiredDateCtrl = requiredDateCtrl;
+                this.attach("keyup");
+            };
+
+            RequiredDateField.prototype = {
+                validate: function () {
+                    var obj = this;
+                    if (obj.requiredDateCtrl.val() === "") {
+                        obj.requiredDateCtrl.parent().find("span").remove();
+                        obj.requiredDateCtrl.parent().find("label").each(function (index) {
+                            $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                        });
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                attach: function (e) {
+                    var obj = this;
+                    if (e === "keyup") {
+                        return obj.requiredDateCtrl.bind(e, function () {
+                            obj.requiredDateCtrl.parent().find("span").remove();
+                        });
+                    }
+                }
+            };
+
+            var RequiredTimeField = function (requiredTimeCtrl) {
+                this.requiredTimeCtrl = requiredTimeCtrl;
+                this.attach("keyup");
+            };
+
+            RequiredTimeField.prototype = {
+                validate: function () {
+                    var obj = this;
+                    if (obj.requiredTimeCtrl.val() === "") {
+                        obj.requiredTimeCtrl.parent().find("span").remove();
+                        obj.requiredTimeCtrl.parent().find("label").each(function (index) {
+                            $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                        });
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                attach: function (e) {
+                    var obj = this;
+                    if (e === "keyup") {
+                        return obj.requiredTimeCtrl.bind(e, function () {
+                            obj.requiredTimeCtrl.parent().find("span").remove();
+                        });
+                    }
+                }
+            };
+
+            var Form = function (formCtrl) {
+                this.formCtrl = formCtrl;
+                var required_list = new Array();
+                var select_list = new Array();
+                var required_number_list = new Array();
+                var required_date_list = new Array();
+                var required_time_list = new Array();
+                this.formCtrl.find("[validation=required]").each(function (index) {
+                    required_list[index] = new RequiredField($(this));
+                });
+                this.formCtrl.find("[validation=select]").each(function (index) {
+                    select_list[index] = new SelectField($(this));
+                });
+                this.formCtrl.find("[validation=number]").each(function (index) {
+                    required_number_list[index] = new RequiredNumberField($(this));
+                });
+                this.formCtrl.find("[validation=date]").each(function (index) {
+                    required_date_list[index] = new RequiredDateField($(this));
+                });
+                this.formCtrl.find("[validation=time]").each(function (index) {
+                    required_time_list[index] = new RequiredTimeField($(this));
+                });
+                this.requireList = required_list;
+                this.selectList = select_list;
+                this.required_number_list = required_number_list;
+                this.required_date_list = required_date_list;
+                this.required_time_list = required_time_list;
+            };
+
+            Form.prototype = {
+                valid: function () {
+                    var obj = this,
+                        is_valid = true;
+                    for (var index = 0; index < obj.requireList.length; index++) {
+                        if (!obj.requireList[index].validate())
+                            is_valid = false;
+                    }
+
+                    for (var pIndex = 0; pIndex < obj.selectList.length; pIndex++) {
+                        if (!obj.selectList[pIndex].validate()) {
+                            is_valid = false;
+                        }
+                    }
+
+                    for (var nIndex = 0; nIndex < obj.required_number_list.length; nIndex++) {
+                        if (!obj.required_number_list[nIndex].validate())
+                            is_valid = false;
+                    }
+
+                    for (var dIndex = 0; dIndex < obj.required_date_list.length; dIndex++) {
+                        if (!obj.required_date_list[dIndex].validate())
+                            is_valid = false;
+                    }
+
+                    for (var tIndex = 0; tIndex < obj.required_time_list.length; tIndex++) {
+                        if (!obj.required_time_list[tIndex].validate())
+                            is_valid = false;
+                    }
+
+                    return is_valid;
+                }
+            };
+
+            var form = $(document.getElementsByTagName("form"));
+            form.submit(function (e) {
+                var validate_form = new Form(form);
+                if (!validate_form.valid()) {
+                    e.preventDefault();
+                }
+            });
+
+            $("#IsSameAddress").change(function () {
+                if (this.checked) {
+                    $("#PostalAddress").val($("#PhysicalAddress").val());
+                }
+                else {
+                    $("#PostalAddress").val("");
+                }
+            });
+
+            $(document.getElementById("FacultyID")).bind("change", function () {
+                var selectedIndex = "";
+                var counter = 0;
+                $("#FacultyID option:selected").each(function (index) {
+                    $.getJSON(@redirect + "/Application/GetQualificationByFaculty?FacultyID=" + $(this).val(), function (data) {
+                        if (counter < data.length) {
+                            for (var opt in data) {
+                                counter++;
+                                var option = $(document.createElement("option"));
+                                option.val(data[opt].QualificationID);
+                                option.text(data[opt].QualificationName);
+                                $("#QualificationID").append(option);
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

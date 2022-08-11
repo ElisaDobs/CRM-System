@@ -1,0 +1,84 @@
+﻿
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+@using MRTD.Core.Models;
+
+@{
+
+    ViewData["Title"] = "Program Schedule";
+
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+
+    int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(ViewBag.MemGuid);
+
+    ModuleActivityBusinessComponent moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
+
+    List<UnitProgramScheduleModel> unitProgramScheduleModels = moduleActivityBusinessComponent.GetModuleActivityResultsByMember(MemberID, DateTime.Now.Year);
+
+    UnitProgramScheduleModel max_activity_obj = unitProgramScheduleModels.FirstOrDefault();
+
+    foreach (var activity_obj in unitProgramScheduleModels)
+    {
+        if (max_activity_obj.ModuleActivity.Count() > max_activity_obj.ModuleActivity.Count())
+        {
+            max_activity_obj = activity_obj;
+        }
+    }
+}
+<div>
+    &nbsp;
+</div>
+<h4>Program Schedule</h4>
+
+<div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Credit</th>
+                    <th>Academic Year</th>
+                    @foreach (var header in max_activity_obj.ModuleActivity)
+                    {
+                        <th>@header.Key</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var body in unitProgramScheduleModels)
+                {
+                    <tr>
+                        <td>
+                            @body.ModuleName
+                        </td>
+                        <td>
+                            @body.Credit
+                        </td>
+                        <td>
+                            @body.AcademicYear
+                        </td>
+                        @foreach (var head in max_activity_obj.ModuleActivity)
+                        {
+
+                            var obj_key = body.ModuleActivity.Where(pair => pair.Key == head.Key).Select(pair => pair);
+
+                            string dash = "---";
+
+                            if (obj_key.Count() > 0)
+                            {
+                                <td>
+                                    @obj_key.FirstOrDefault().Value
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @dash
+                                </td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

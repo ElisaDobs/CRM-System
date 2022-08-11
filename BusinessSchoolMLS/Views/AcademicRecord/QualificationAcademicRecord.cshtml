@@ -1,0 +1,71 @@
+﻿
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+@{
+    ViewData["Title"] = "Qualification Academic Records";
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+    OnlineModuleActivityBusinessComponent onlineModuleActivityBusinessComponent = new OnlineModuleActivityBusinessComponent();
+    string mguid = ViewBag.MemGuid,
+           sguid = ViewBag.StudentGuid,
+           ssguid = string.Empty;
+
+    if (!string.IsNullOrEmpty(sguid))
+    {
+        ssguid = sguid;
+    }
+    else
+    {
+        ssguid = mguid;
+    }
+    int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(ssguid);
+    int QualID = ViewBag.QualID;
+    int ActivityID = ViewBag.ActivityID;
+    var all_module_academics = onlineModuleActivityBusinessComponent.GetAcademicRecordByMemberID(QualID, MemberID, ActivityID);
+    var qual_obj = onlineModuleActivityBusinessComponent.GetAllQualificationAcademicRecordByMemberID(MemberID).FirstOrDefault(qual => qual.QualificationID == QualID);
+}
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 style="color: #6d2829;">@qual_obj.QualificationName - Academic Records</h4>
+</div>
+
+<div>
+    @using (Html.BeginForm("AcademicDownLoad", "AcademicRecord", FormMethod.Post))
+    {
+        <input type="hidden" name="AdminMemberID" value="@mguid" />
+        <input type="hidden" name="MemberID" value="@ssguid" />
+        <input type="hidden" name="QualificationID" value="@QualID" />
+        <input type="hidden" name="ActivityID" value="@ActivityID" />
+        <img src="~/pdf-icon.png" width="50" height="50" />
+        <input type="submit" value="Download" class="btn btn-default" />
+    }
+</div>
+<div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Name</th>
+                    <th>NQF Level</th>
+                    <th>Year</th>
+                    <th>Mark</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member_module in all_module_academics)
+                {
+                    <tr>
+                        <td>@member_module.UnitCode</td>
+                        <td>@member_module.ModuleName</td>
+                        <td>@member_module.ModuleNQLevel</td>
+                        <td>@member_module.AcademicYear</td>
+                        <td>@member_module.Mark</td>
+                        <td>@member_module.Remark</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

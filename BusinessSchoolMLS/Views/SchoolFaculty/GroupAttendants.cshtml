@@ -1,0 +1,138 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+@using MRTD.Core.Models;
+
+@{
+    ViewData["Title"] = "Unit Group Attendance";
+    string mguid = ViewBag.MemGuid;
+    int GroupID = ViewBag.GroupID;
+
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+
+    ModuleActivityBusinessComponent moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
+
+    List<ModuleMemberModel> moduleMemberModels = moduleActivityBusinessComponent.GetRegisteredByGroupID(GroupID);
+
+    List<ModuleMemberModel> lst_all_modules = facultyBusinessComponent.GetAttendanceStudentsByGroupID(GroupID);
+
+    List<GroupAttendanceModule> lst_all_attendants = facultyBusinessComponent.GetGroupAttendantsByGroupID(GroupID);
+
+    ModuleGroupModel moduleGroupModel = facultyBusinessComponent.GetModuleGroupByGroupID(GroupID);
+}
+
+<script type="text/javascript">
+
+    function addFunction() {
+        $("#RegisteredAtt > option:selected").each(function (index) {
+            var option = $("<option value=\"" + $(this).attr("value") + "\" selected=\"selected\">" + $(this).text() + "</option>")
+            $("#MemberID").append(option);
+            $(this).remove();
+        });
+    }
+
+    function removeFunction() {
+        $("#MemberID > option:selected").each(function (index) {
+            var option = $("<option value=\"" + $(this).attr("value") + "\" selected>" + $(this).text() + "</option>")
+            $("#RegisteredAtt").append(option);
+            $(this).remove();
+        });
+    }
+
+</script>
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 style="color: #6d2829;">Unit Group Attendance - @moduleGroupModel.GroupName</h4>
+</div>
+
+<div>
+    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-att">Add Attendant</button>
+</div>
+
+<div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Group Name</th>
+                    <th>Student Name</th>
+                    <th>Cell No</th>
+                    <th>E-Email Address</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attendant in lst_all_attendants)
+                {
+                    <tr>
+                        <td>@attendant.GroupName</td>
+                        <td>@attendant.FullName</td>
+                        <td>@attendant.CellNo</td>
+                        <td>@attendant.EmailAddress</td>
+                        <td>@attendant.AttDate.ToString("yyyy - MM - dd")</td>
+                        <td>@attendant.AttTime</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="create-att" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Attendant</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("SaveUnitGroupMembers", string.Format("SchoolFaculty"), FormMethod.Post))
+                {
+                    <input type="hidden" name="UserID" value="@mguid" />
+                    <input type="hidden" name="GroupID" value="@GroupID" />
+                    <div style="width: 100%; display: inline-block;">
+                        <div style="width: 30%; display: inline-block;">
+                            <div class="form-group">
+                                <label for="RegisteredAtt">Unit Registered</label>
+                                <select class="form-control" name="RegisteredAtt" id="RegisteredAtt" style="height: 200px;" multiple>
+                                    @foreach (var registered in moduleMemberModels)
+                                    {
+                                    <option value="@registered.MemberID">@registered.FullName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div style="width: 20%; display: inline-block; vertical-align: middle; text-align:center; height: 200px;">
+                            <div>
+                                <button type="button" id="btnAdd" onclick="addFunction()" class="btn btn-default" style="width: 100px;">Add</button>
+                            </div>
+                            <div>
+                                &nbsp;
+                            </div>
+                            <div>
+                                <button type="button" id="btnRemove" onclick="removeFunction()" class="btn btn-default" style="width: 100px;">Remove</button>
+                            </div>
+                        </div>
+                        <div style="width: 30%; display: inline-block;">
+                            <div class="form-group">
+                                <label for="MemberID">Group Attendants</label>
+                                <select class="form-control" name="MemberID" id="MemberID" style="height: 200px;" multiple>
+                                    @foreach(var att in lst_all_modules)
+                                    {
+                                        <option value="@att.MemberID">@att.FullName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width: 100%; text-align: center;">
+                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

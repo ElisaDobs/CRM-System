@@ -1,0 +1,32 @@
+﻿
+@using BusinessSchoolMLS.SchoolBusinessComponent
+@using MRTD.Core.Models;
+
+@{
+    ViewData["Title"] = "Learning Programs";
+    string mguid = ViewBag.MemGuid;
+    int FacultyID = ViewBag.FacultyID;
+    int ProgramID = ViewBag.ProgramID;
+
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+
+    var lst_all_Learning_program = facultyBusinessComponent.GetAllFacultyQualificationByFacultyID(FacultyID)?.FirstOrDefault(program => program.QualificationID == ProgramID);
+}
+<div>
+    &nbsp;
+</div>
+@if (lst_all_Learning_program != null)
+{
+    <h4 style="color: #377091;">@lst_all_Learning_program.QualificationName</h4>
+
+    <div>
+        <p style="color: #377091;">
+            Course Overview
+        </p>
+        <p>
+            @lst_all_Learning_program.QualificationDescription
+        </p>
+    </div>
+}
+
+

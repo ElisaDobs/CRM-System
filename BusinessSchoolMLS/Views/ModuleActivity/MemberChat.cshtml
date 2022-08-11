@@ -1,0 +1,153 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Study Unit Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    LoginBusinessComponent login = new LoginBusinessComponent();
+    ModuleActivityBusinessComponent component = new ModuleActivityBusinessComponent();
+    int MemberID = login.GetMemberIDByMemberGuid(ViewBag.MemGuid);
+    var lst_chat_per_member = component.GetChatsByMemberId(MemberID);
+}
+<div>
+    &nbsp;
+</div>
+<input type="hidden" id="mid" value="@ViewBag.MemGuid" />
+<div style="width: 100%; display: inline-block; background-color: aliceblue; border-left: 1px aliceblue solid; height: 500px;">
+    <div class="table-responsive" style="width: 30%; display: inline-block; background-color: white; height: 500px;">
+        <table class="table" id="tblChat">
+            <thead>
+                <tr>
+                    <th>RECENT CHATS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var chat in lst_chat_per_member)
+                {
+                <tr>
+                    <td id="@chat.ChatID" style="cursor: pointer; border-bottom: 1px silver solid;">
+                        @chat.ChatName
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div style="width: 60%; display: inline-block; height: 500px; top: 80px; position: absolute;">
+        <div style="width: 100%; height: 450px;">
+            <input type="hidden" id="selectedChatId" />
+            <div style="font: 15px; font-weight: bold; margin-top: 0px; left: 5px;" id="ChatName">
+            </div>
+            <div style="width: 55%; height: 300px;" id="divChats">
+            </div>
+        </div>
+        <div style="width: 100%; height: 50px; display: inline-block; left: 5px;">
+            <input type="text" name="postChat" id="postChat" class="form-control" style="width: 60%; left: 5px; display: inline-block;" />
+            <button type="button" class="btn btn-default btn-sm" id="btnSend" style="display: inline-block;">
+                <span class="glyphicon glyphicon-send"></span>Send
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+
+    var EnterChat = function (field) {
+        this.field = field;
+        this.event("keypress");
+    }
+    EnterChat.prototype = {
+        checkChats: function (chatid) {
+            var obj = this;
+            $.ajax({
+                url: "/ModuleActivity/GetNewChatsByChatID",
+                type: "post",
+                contentType: 'application/x-www-form-urlencoded',
+                data: obj.createForm($("#mid").val(), chatid, null).serialize(),
+                success: function (data) {
+                    if (data === true) {
+                        $(document.getElementById(chatid)).css({ 'font-weight': 'bold' });
+                    }
+                }
+            });
+        },
+        send: function () {
+            var obj = this;
+            $.ajax({
+                url: "/ModuleActivity/SaveUnitMessagePost",
+                type: "post",
+                contentType: 'application/x-www-form-urlencoded',
+                data: obj.createForm($("#mid").val(), $("#selectedChatId").val(), obj.field.val()).serialize(),
+                success: function (data) {
+                    obj.field.val("");
+                    $("#divChats").html("");
+                    $("#divChats").html(data);
+                }
+            });
+        },
+        event: function (e) {
+            var obj = this;
+            obj.field.on(e, function (key) {
+                if (key.which === 13) {
+                    obj.send();
+                }
+            });
+        },
+        createForm: function (memguid, chatid, chat) {
+            var form = $(document.createElement("Form"));
+            form.append($("<input type=\"hidden\" name=\"MemberID\" value=\"" + memguid + "\" />"));
+            form.append($("<input type=\"hidden\" name=\"ChatID\" value=\"" + chatid + "\" />"));
+            if (chat !== null) {
+                form.append($("<input type=\"hidden\" name=\"MessageText\" value=\"" + chat + "\" />"));
+            }
+            return form;
+        },
+        getChat: function (chatid) {
+            var obj = this;
+            $.ajax({
+                url: "/ModuleActivity/GetMessageChatByChatID",
+                type: "post",
+                contentType: 'application/x-www-form-urlencoded',
+                data: obj.createForm($("#mid").val(), chatid, null).serialize(),
+                success: function (data) {
+                    $("#divChats").html("");
+                    $("#divChats").html(data);
+                }
+            });
+        }
+    }
+
+
+    $(document).ready(function () {
+        var enterChat = new EnterChat($(document.getElementById("postChat")));
+        $("#tblChat tr > td").bind("click", function () {
+            $("#ChatName").text("");
+            $("#divChats").html("");
+            var hiddenField = $(document.createElement("input"));
+            hiddenField.attr("type", "hidden");
+            hiddenField.attr("id", "chat_id");
+            hiddenField.attr("value", $(this).attr("id"));
+            $("#ChatName").append(hiddenField);
+            $("#ChatName").text($(this).text() + " | Chat");
+            $("#selectedChatId").attr("value", $(this).attr("id"));
+            enterChat.getChat($(this).attr("id")); //Get chats
+        });
+        $("#btnSend").bind(function () {
+            enterChat.send();
+        });
+        window.setInterval(function () {
+            if ($("#selectedChatId").val() !== "") {
+                enterChat.getChat($("#selectedChatId").val());
+            }
+        }, 2000);
+        window.setInterval(function () {
+            $("#tblChat tr > td").each(function (index) {
+                if ($(this).attr("id") !== $("#selectedChatId").val()) {
+                    enterChat.checkChats($(this).attr("id"));
+                }
+            });
+        }, 2000);
+
+        $("#divChats").scrollTop(300);
+    });
+</script>

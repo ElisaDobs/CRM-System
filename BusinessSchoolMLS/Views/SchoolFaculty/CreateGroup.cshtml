@@ -1,0 +1,396 @@
+﻿@model MRTD.Core.Models.UnitGroupModel;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Create/Edit Group";
+    string mguid = ViewBag.MemGuid;
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+
+    var all_groups = facultyBusinessComponent.GetAllUnitGroupByUnitID(0);
+}
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
+
+    .tipp-label {
+        color: #377091;
+    }
+
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+    .tipp-top-heading
+    {
+        top: 80px;
+        position: absolute;
+    }
+</style>
+<div>
+    &nbsp;
+</div>
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">Create/Edit Group</h4>
+    </div>
+    <div>
+        &nbsp;
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit Name</th>
+                    <th>Group Name</th>
+                    <th>Attendance Date</th>
+                    <th>Attendance Time</th>
+                    <!--<th></th>-->
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var qual_module in all_groups)
+                {
+                    <tr>
+                        <td>@qual_module.ModuleName</td>
+                        <td>@qual_module.GroupName</td>
+                        <td>@qual_module.AttDate.ToString("yyyy - MM - dd")</td>
+                        <td>@qual_module.AttTime</td>
+                        <!--<td><a href="#" data-toggle="modal" data-target="#@qual_module.GroupID">Edit</a></td>-->
+                        <td>@Html.ActionLink("Add Attendants", "GroupAttendants", "SchoolFaculty", new { mid = mguid, gid = qual_module.GroupID })</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <button type="button" data-toggle="modal" class="btn btn-default tipp-btn-default" data-target="#create-group">Create Group</button>
+    </div>
+</div>
+<div id="create-group" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title tipp-header">Create Group</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("SaveUnitGroup", string.Format("SchoolFaculty"), FormMethod.Post))
+                {
+                    <input type="hidden" name="MemberID" value="@mguid" />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.GroupName, new { @class="tipp-label" })
+                        @Html.TextBoxFor(model => Model.GroupName, new { @class = "form-control tipp-input-field", validation = "required" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ModuleID, new { @class="tipp-label" })
+                        @Html.DropDownListFor(model => model.ModuleID, Model.ModuleList, new { @class = "form-control tipp-input-field", validation = "select" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AttDate, new { @class="tipp-label" })
+                        @Html.TextBoxFor(model => Model.AttDate, new { @class = "form-control tipp-input-field", @type = "date", validation = "date" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AttTime, new { @class="tipp-label" })
+                        @Html.TextBoxFor(model => Model.AttTime, new { @class = "form-control tipp-input-field", @type = "time", validation = "time" })
+                    </div>
+                    <div class="form-group">
+                    </div>
+                    <div class="tipp-btn-container">
+                        <button type="submit" class="btn btn-default tipp-btn-default" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-default tipp-btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+<!--<script type="text/javascript" src="~/js/jquery-validation-engine.js"></script>-->
+<script type="text/javascript">
+
+    /*
+ * Author Name :     Tsaleni Dobson Maswanganye
+ * Date        :     2018 - 07 - 06
+ * Description :     Validate madatory fields
+ */
+
+    var SelectField = function (selectCtrl) {
+        this.selectCtrl = selectCtrl;
+        this.attach("change");
+    };
+
+    SelectField.prototype = {
+        attach: function (e) {
+            var obj = this;
+            if (e === "change") {
+                obj.selectCtrl.bind(e, function () {
+                    obj.selectCtrl.parent().find("span").remove();
+                });
+            }
+        },
+        validate: function () {
+            var obj = this;
+            if (obj.selectCtrl.find("option:selected").val() === "0") {
+                obj.selectCtrl.parent().find("span").remove();
+                obj.selectCtrl.parent().find("label").each(function () {
+                    $("<span style='color: red;'> * required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    };
+
+    var RequiredField = function (requiredCtrl) {
+        this.requiredCtrl = requiredCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredCtrl.val() === "") {
+                obj.requiredCtrl.parent().find("span").remove();
+                obj.requiredCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredCtrl.bind(e, function () {
+                    obj.requiredCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var RequiredNumberField = function (requiredNumberCtrl) {
+        this.requiredNumberCtrl = requiredNumberCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredNumberField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredNumberCtrl.val() === "0") {
+                obj.requiredNumberCtrl.parent().find("span").remove();
+                obj.requiredNumberCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredNumberCtrl.bind(e, function () {
+                    obj.requiredNumberCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var RequiredDateField = function (requiredDateCtrl) {
+        this.requiredDateCtrl = requiredDateCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredDateField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredDateCtrl.val() === "") {
+                obj.requiredDateCtrl.parent().find("span").remove();
+                obj.requiredDateCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredDateCtrl.bind(e, function () {
+                    obj.requiredDateCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var RequiredTimeField = function (requiredTimeCtrl) {
+        this.requiredTimeCtrl = requiredTimeCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredTimeField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredTimeCtrl.val() === "") {
+                obj.requiredTimeCtrl.parent().find("span").remove();
+                obj.requiredTimeCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredTimeCtrl.bind(e, function () {
+                    obj.requiredTimeCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var Form = function (formCtrl) {
+        this.formCtrl = formCtrl;
+        var required_list = new Array();
+        var select_list = new Array();
+        var required_number_list = new Array();
+        var required_date_list = new Array();
+        var required_time_list = new Array();
+        this.formCtrl.find("[validation=required]").each(function (index) {
+            required_list[index] = new RequiredField($(this));
+        });
+        this.formCtrl.find("[validation=select]").each(function (index) {
+            select_list[index] = new SelectField($(this));
+        });
+        this.formCtrl.find("[validation=number]").each(function (index) {
+            required_number_list[index] = new RequiredNumberField($(this));
+        });
+        this.formCtrl.find("[validation=date]").each(function (index) {
+            required_date_list[index] = new RequiredDateField($(this));
+        });
+        this.formCtrl.find("[validation=time]").each(function (index) {
+            required_time_list[index] = new RequiredTimeField($(this));
+        });
+        this.requireList = required_list;
+        this.selectList = select_list;
+        this.required_number_list = required_number_list;
+        this.required_date_list = required_date_list;
+        this.required_time_list = required_time_list;
+    };
+
+    Form.prototype = {
+        valid: function () {
+            var obj = this,
+                is_valid = true;
+            for (var index = 0; index < obj.requireList.length; index++) {
+                if (!obj.requireList[index].validate())
+                    is_valid = false;
+            }
+
+            for (var pIndex = 0; pIndex < obj.selectList.length; pIndex++) {
+                if (!obj.selectList[pIndex].validate()) {
+                    is_valid = false;
+                }
+            }
+
+            for (var nIndex = 0; nIndex < obj.required_number_list.length; nIndex++) {
+                if (!obj.required_number_list[nIndex].validate())
+                    is_valid = false;
+            }
+
+            for (var dIndex = 0; dIndex < obj.required_date_list.length; dIndex++) {
+                if (!obj.required_date_list[dIndex].validate())
+                    is_valid = false;
+            }
+
+            for (var tIndex = 0; tIndex < obj.required_time_list.length; tIndex++) {
+                if (!obj.required_time_list[tIndex].validate())
+                    is_valid = false;
+            }
+
+            return is_valid;
+        }
+    };
+
+    $(document).ready(function () {
+        var form = $(document.getElementsByTagName("form"));
+        form.submit(function (e) {
+            var validate_form = new Form(form);
+
+            if (!validate_form.valid()) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>

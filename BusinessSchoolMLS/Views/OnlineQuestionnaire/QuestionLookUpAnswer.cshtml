@@ -1,0 +1,72 @@
+﻿
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Question answer";
+    string mguid = ViewBag.MemGuid;
+    int QuestionID = ViewBag.QuestionID;
+}
+
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#LookUpAnswerNo").bind("keyup", function () {
+            if ($(this).val() != "") {
+                $("#tblLookupAnswer").find("tbody").each(function (index) { $(this).remove(); });
+                var number_of_rows = parseInt($(this).val());
+                var tblBody = $(document.createElement("tbody"));
+                for (var index = 1; index <= number_of_rows; index++) {
+                    var tblRow = $("<tr><td><input type=\"text\" name=\"" + index + "\" /></td><td><input type=\"number\" name=\"" + index + "\" /></td><td><input type=\"checkbox\" name=\"" + index +"\" /></td></tr>");
+                    tblRow.appendTo(tblBody);
+                }
+                tblBody.appendTo($("#tblLookupAnswer"));
+                $("#tblLookupAnswer").show();
+            }
+            else {
+                $("#tblLookupAnswer").hide();
+            }
+        });
+    });
+
+</script>
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h2 style="color: #6d2829;">Question Answer(s)</h2>
+</div>
+<div>
+    <div class="form-group">
+        <label for="LookUpAnswerNo">Number of Answer</label>
+        <input type="number" id="LookUpAnswerNo" name="LookUpAnswerNo" class="form-control" />
+    </div>
+    @using (Html.BeginForm("SaveLookupAnswer", "OnlineQuestionnaire", FormMethod.Post))
+    {
+        <input type="hidden" name="QuestionID" value="@QuestionID" />
+        <input type="hidden" name="MemberID" value="@mguid" />
+        <div class="table-responsive">
+            <table id="tblLookupAnswer" style="display: none;" class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Answer Text
+                        </th>
+                        <th>
+                            Score
+                        </th>
+                        <th>
+                            Is Correct
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-default">Save</button>
+        </div>
+    }
+</div>

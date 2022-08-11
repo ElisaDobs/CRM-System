@@ -1,0 +1,442 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Program Unit Chat";
+    string mid = ViewBag.MemGuid;
+
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+
+    var lst_all_units = facultyBusinessComponent.GetRegisteredUnitByMemberID(mid);
+}
+
+<style type="text/css">
+    .auto-complete {
+        border-left: 1px solid black;
+        border-bottom: 1px solid black;
+        border-right: 1px solid black;
+        z-index: 1000;
+        position: absolute;
+        background-color: white;
+        height: auto;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+<script type="text/javascript">
+
+    function getLabelHeader(headers) {
+
+        var header_arr = new Array();
+
+        $.each(headers, function (key, value) {
+            header_arr.push({ Value: key, Text: value });
+        });
+
+        return header_arr
+    }
+
+    function contains(sarchedString, searchItem) {
+
+        if (sarchedString.toLowerCase().indexOf(searchItem.toLowerCase()) >= 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function autoComplete(currentCtrl, comparer, headers, jsondata) {
+
+        if ($(currentCtrl).val() != "") {
+
+            var search_value = $(currentCtrl).val();
+            $(currentCtrl).parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+
+            var lst_all_headers = getLabelHeader(headers),
+                div_autocomplete = $(document.createElement("div")),
+                tbl_autocomplete = $(document.createElement("table")),
+                tbl_autocomplete_header = $(document.createElement("thead")),
+                tbl_autocomplete_t_row = $(document.createElement("tr"));
+            div_autocomplete.addClass("auto-complete");
+            tbl_autocomplete.addClass("table");
+            tbl_autocomplete.css("width", "95%");
+            tbl_autocomplete.css("left", "2.5%");
+            tbl_autocomplete.css("position", "relative");
+            tbl_autocomplete_header.append(tbl_autocomplete_t_row);
+            for (var header in lst_all_headers) {
+                var row_th = $("<th>" + lst_all_headers[header].Text + "</th>");
+                tbl_autocomplete_t_row.append(row_th);
+            }
+
+            tbl_autocomplete.append(tbl_autocomplete_header);
+            div_autocomplete.css("width", $(currentCtrl).outerWidth() + "px");
+            div_autocomplete.append(tbl_autocomplete);
+
+            var tbl_body_autocomplete = $(document.createElement("tbody"));
+            var atleast_exist = false;
+            for (var row in jsondata) {
+
+                var tbl_row_autocomplete = $(document.createElement("tr")),
+                    data_row = getLabelHeader(jsondata[row]);
+
+                tbl_row_autocomplete.bind("mouseenter", function (e) {
+                    $(this).css("background-color", "silver");
+                    $(this).css("cursor", "pointer");
+                    $(this).bind("click", function () {
+                        var selected_row = this.getElementsByTagName("td");
+                        document.getElementById("search_value").value = $(selected_row[0]).text();
+                        document.getElementById("search_text").value = $(selected_row[2]).text();
+                        $(this).parent().parent().parent().parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+                    });
+                });
+
+                tbl_row_autocomplete.bind("mouseout", function (e) {
+                    $(this).css("background-color", "");
+                    $(this).unbind("click");
+                });
+                var is_campare = false;
+                var exist = false;
+                for (var key in data_row) {
+                    if (comparer == data_row[key].Value) {
+                        is_campare = contains(data_row[key].Text, search_value);
+                        if (is_campare == true) {
+                            exist = true;
+                        }
+                    }
+                    $("<td>" + data_row[key].Text + "</td>").appendTo(tbl_row_autocomplete);
+                }
+                if (exist == true) {
+                    atleast_exist = exist;
+                    tbl_body_autocomplete.append(tbl_row_autocomplete);
+                }
+            }
+            if (atleast_exist == true) {
+
+                tbl_body_autocomplete.appendTo(tbl_autocomplete);
+
+                $(currentCtrl).parent().append(div_autocomplete);
+            }
+        }
+        else {
+            $(currentCtrl).parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+        }
+    }
+
+
+
+    var DataLayer = function () {
+    }
+    DataLayer.prototype = {
+        loadCommment: function () {
+            $.getJSON("/ModuleActivity/GetUnitMessagePostByModuleID?module_id=" + document.getElementById("module_id").value, function (data) {
+                var msg_posts = data;
+                $("#id-comment-post").empty();
+                for (var _post in msg_posts) {
+                    $("<div style=\"width: 100%;\"><p><span style=\"font-weight: bold;\">" + msg_posts[_post].FullName + " - </span>"
+                        + msg_posts[_post].PostText + "</p>").appendTo($("#id-comment-post"));
+                }
+            });
+        },
+        loadChat: function () {
+            $.getJSON("/ModuleActivity/GetAllChatByModuleID?module_id=" + document.getElementById("module_id").value, function (data) {
+                var chatArr = data;
+                $("#id-chat-message").empty();
+                for (var chat in chatArr) {
+                    $("<div><p><span style=\"font-weight: bold;\">" + chatArr[chat].FullName + "</span>  - " + chatArr[chat].MessageText + "</p></div>").appendTo($("#id-chat-message"));
+                }
+            });
+        },
+        postComment: function () {
+            if (document.getElementById("txtComment").value != "") {
+                var requestForm = "<form><input type='hidden' name='mid' value='" + document.getElementById("mid").value
+                    + "' /><input type='hidden' name='module_id' value='" + document.getElementById("module_id").value
+                    + "' /><input type='hidden' name='post_msg' value='" + document.getElementById("txtComment").value + "' /></form>";
+
+                var obj = this;
+
+                $.ajax({
+                    url: "/ModuleActivity/SaveUnitMessagePost",
+                    type: "post",
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: $(requestForm).serialize(),
+                    success: function (data, textStatus, jQxhr) {
+                        $(document.getElementById("txtComment")).val("");
+                        obj.loadCommment();
+                    }
+                });
+            }
+        },
+        postChat: function () {
+            if (document.getElementById("txtAreaChat").value != "") {
+                var requestForm = "<form><input type='hidden' name='mid' value='" + document.getElementById("mid").value
+                    + "' /><input type='hidden' name='module_id' value='" + document.getElementById("module_id").value
+                    + "' /><input type='hidden' name='msgText' value='" + document.getElementById("txtAreaChat").value + "' /></form>";
+                var obj = this;
+                $.ajax({
+                    url: "/ModuleActivity/SaveMessageChat",
+                    type: "post",
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: $(requestForm).serialize(),
+                    success: function (data, textStatus, jQxhr) {
+                        $(document.getElementById("txtAreaChat")).val("");
+                        obj.loadChat();
+                    }
+                });
+            }
+        }
+    }
+
+    var UnitChat = function (ctrl) {
+        this.ctrl = ctrl;
+        this.datalayer = new DataLayer();
+    }
+
+    UnitChat.prototype = {
+        load: function () {
+            var obj = this;
+            obj.attach("click");
+        },
+        attach: function (event) {
+            var obj = this;
+            if (event == "click") {
+                return obj.ctrl.bind(event, function () {
+                    obj.populate();
+                });
+            }
+        },
+        populate: function () {
+            var obj = this;
+            document.getElementById("module_id").value = document.getElementById("search_value").value;
+            document.getElementById("id-chat-header").innerText = document.getElementById("search_text").value;
+            obj.datalayer.loadCommment();
+            obj.datalayer.loadChat();
+        }
+    }
+
+    var OpenChat = function (ctrl) {
+        this.ctrl = ctrl;
+    }
+
+    OpenChat.prototype = {
+        load: function () {
+            var obj = this;
+            obj.attach("click");
+        },
+        attach: function (event) {
+            var obj = this;
+            if (event == "click") {
+                return obj.ctrl.bind(event, function () {
+                    if (obj.ctrl.text() == "Open chat") {
+                        $("#txtAreaChat").val("");
+                        $("#id-chat").show();
+                        obj.ctrl.text("Close chat");
+                    }
+                    else {
+                        $("#txtAreaChat").val("");
+                        $("#id-chat").hide();
+                        obj.ctrl.text("Open chat");
+                    }
+                });
+            }
+        }
+    }
+
+    var SendComment = function (ctrl) {
+        this.ctrl = ctrl;
+        this.datalayer = new DataLayer();
+    }
+
+    SendComment.prototype = {
+        load: function () {
+            var obj = this;
+            obj.attach("click");
+        },
+        attach: function (event) {
+            var obj = this;
+            if (event == "click") {
+                return obj.ctrl.bind(event, function () {
+                    obj.comment();
+                });
+            }
+        },
+        comment: function () {
+            var obj = this;
+            obj.datalayer.postComment();
+        }
+    }
+
+    var SendChat = function (ctrl) {
+        this.ctrl = ctrl;
+        this.datalayer = new DataLayer();
+    }
+
+    SendChat.prototype = {
+        load: function () {
+            var obj = this;
+            obj.attach("click");
+        },
+        attach: function (event) {
+            var obj = this;
+            if (event == "click") {
+                return obj.ctrl.bind(event, function () {
+                    obj.Chat();
+                });
+            }
+        },
+        Chat: function () {
+            var obj = this;
+            obj.datalayer.postChat();
+            obj.datalayer.loadChat();
+        }
+    }
+
+    var TextComment = function (ctrl) {
+        this.ctrl = ctrl;
+        this.datalayer = new DataLayer();
+    }
+
+    TextComment.prototype = {
+        load: function () {
+            var obj = this;
+            obj.attach("keypress");
+        },
+        attach: function (event) {
+            var obj = this;
+            if (event == "keypress") {
+                return obj.ctrl.bind(event, function (e) {
+                    if (e.which == 13) {
+                        obj.datalayer.postComment();
+                        obj.datalayer.loadCommment();
+                    }
+                });
+            }
+        }
+    }
+
+    var TextChat = function (ctrl) {
+        this.ctrl = ctrl;
+        this.datalayer = new DataLayer();
+    }
+
+    TextChat.prototype = {
+        load: function () {
+            var obj = this;
+            obj.attach("keypress");
+        },
+        attach: function (event) {
+            var obj = this;
+            if (event == "keypress") {
+                return obj.ctrl.bind(event, function (e) {
+                    if (e.which == 13) {
+                        obj.datalayer.postChat();
+                        obj.datalayer.loadChat();
+                    }
+                });
+            }
+        }
+    }
+
+    $(document).ready(function () {
+
+        $.getJSON("/SchoolFaculty/GetRegisteredUnitByMemberID?MemberID=" + document.getElementById("mid").value,
+            function (response) {
+                $("#search_text").bind("keyup", function (e) {
+                    var headers = { ID: "#", UnitID: "Unit ID", UnitName: "Unit Name" },
+                        comparer = "UnitName";
+                    autoComplete(this, comparer, headers, response);
+                });
+            });
+
+        var unitChat = new UnitChat($(document.getElementById("btnSearch")));
+        unitChat.load();
+
+        var openChat = new OpenChat($(document.getElementById("btnOpenChat")));
+        openChat.load();
+
+        var sendComment = new SendComment($(document.getElementById("btnComment")));
+        sendComment.load();
+
+        var enterComment = new TextComment($(document.getElementById("txtComment")));
+        enterComment.load();
+
+        var enterChat = new TextChat($(document.getElementById("txtAreaChat")));
+        enterChat.load();
+
+        var sendChat = new SendChat($(document.getElementById("btnSendChat")));
+        sendChat.load();
+
+        window.setInterval(function () {
+            var data_source = new DataLayer();
+            data_source.loadCommment();
+        }, 5000);
+
+        window.setInterval(function () {
+            var data_source = new DataLayer();
+            data_source.loadChat();
+        }, 5000);
+    });
+
+</script>
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h2 style="color: #6d2829;">Create Study Unit Chat</h2>
+</div>
+
+<input type="hidden" name="mid" id="mid" value="@mid" />
+<input type="hidden" name="module_id" id="module_id" />
+
+<div style="width: 100%; display: inline-block;" id="chatContainer">
+    <div style="width: 60%; display: inline-block;">
+        <div style="width: 100%; display: inline-block;">
+            <div class="form-group" style="width: 80%; display: inline-block;">
+                <label for="UnitID">Unit Name</label>
+                <input type="hidden" name="UnitID" id="search_value" />
+                <input type="text" id="search_text" class="form-control" autocomplete="off" />
+            </div>
+            <div style="width: 15%; display: inline-block;">
+                <button type="button" class="btn btn-info" id="btnSearch">
+                    <span class="glyphicon glyphicon-search"></span> Search
+                </button>
+            </div>
+        </div>
+        <div style="width: 100%; display: inline-block;">
+            <div style="display: inline-block; width: 75%;">
+                <input type="text" name="txtComment" id="txtComment" class="form-control" />
+            </div>
+            <div style="display: inline-block; width: 20%;">
+                <button type="button" class="btn btn-default" id="btnComment">Comment</button>
+            </div>
+        </div>
+        <div style="width: 100%;" id="id-comment-post">
+        </div>
+    </div>
+    <div style="width: 35%; display: inline-block; bottom: 10px; position: static;">
+        <div id="loggen_id" style="width: 100%;">
+        </div>
+        <div class="form-group" id="id-chat" style="display: none; width: 100%;  border: 1px solid #808080; border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;">
+            <div style="width: 100%; height: 30px; border-bottom: 1px solid #808080; font-weight: bold; color: #6d2829; display: inline-block;">
+                <div style="display: inline-block; width: 75%; text-align: left;" id="id-chat-header">
+                </div>
+                <div style="display: inline-block; width: 20%; text-align: right;">
+                    <button type="button" class="close" onclick="openChat(this)" aria-hidden="true">&times;</button>
+                </div>
+            </div>
+            <div class="pre-scrollable" style="width: 100%; height: 100px;" id="id-chat-message">
+            </div>
+            <div style="display: inline-block; width: 100%;">
+                <div style="display: inline-block; width: 60%;">
+                    <input name="txtAreaChat" id="txtAreaChat" class="form-control" />
+                </div>
+                <div style="display: inline-block; width: 30%;">
+                    <button type="button" id="btnSendChat" class="btn btn-default">Send</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button type="button" id="btnOpenChat" class="btn btn-default">Open chat</button>
+        </div>
+    </div>
+</div>

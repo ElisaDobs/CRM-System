@@ -1,0 +1,30 @@
+﻿
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Unit Activitity Upload";
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+    int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(ViewBag.MemGuid);
+    int ModuleActivityID = ViewBag.ModuleActivityID;
+}
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 style="color: #6d2829;">Unit Activitity Upload</h4>
+</div>
+
+<div>
+    @using (Html.BeginForm("SaveModuleActivityUpload", "ModuleActivity", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="hidden" name="MemberID" value="@MemberID" />
+        <input type="hidden" name="ModuleActivityID" value="@ModuleActivityID" />
+        <div class="form-group">
+            <label for="ActivityUpload">Activity Upload(pdf/word doc)</label>
+            <input type="file" name="ActivityUpload" id="ActivityUpload" class="form-control" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-default" style="width: 100px;">Save</button>
+        </div>
+    }
+</div>

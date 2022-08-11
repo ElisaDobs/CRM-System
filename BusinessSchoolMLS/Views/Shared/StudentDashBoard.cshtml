@@ -1,0 +1,363 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Learner";
+    string mid = ViewBag.MemGuid;
+    int Month = DateTime.Now.Month;
+    LoginBusinessComponent component = new LoginBusinessComponent();
+    var memberProfile = component.GetMemberProfileByMemberId(mid);
+}
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
+
+    .tipp-label {
+        color: #377091;
+    }
+
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+    }
+
+    .tipp-calender {
+        width: 33%;
+        display: inline-block;
+    }
+</style>
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 class="tipp-header">Welcome to Tipp Academy Student Portal</h4>
+</div>
+<input type="hidden" id="MemberID" value="@mid" />
+<input type="hidden" id="Month" value="@Month" />
+
+<div style="width: 100%; display: inline-block;">
+    <div style="width: 33%; display: inline-block;">
+        <div>
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <label class="tipp-header">BIOGRAPHICAL DETAIL</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">First Name</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.FirstName</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">Last Name:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">  @memberProfile.LastName</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">ID No:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.IDNo</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">Title</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.Title</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">Gender:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.Gender</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label class="tipp-header">CONTACT DETAILS</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">Cell No:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.CellNo</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">E-mail Address:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.EmailAddress</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">Home TelNo:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.HomeTelNo</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">Work TelNo:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.WorkTelNo</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="tipp-label">Physical Address:</label>
+                    </td>
+                    <td>
+                        <label class="tipp-label">@memberProfile.PhysicalAddress</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div style="width: 33%; display: inline-block;">
+        <!--<div class="">
+        <header class="new-icon">
+            News feed title
+        </header>
+        <ul>
+            <li>
+                <article>
+                    <header>News item title</header>
+                    <p>Lorem ipsum</p>
+                    <p>Lorem ipsum</p>
+                    <p>Lorem ipsum</p>
+                    <footer>
+                        <a href="#">Read more</a>
+                        <span>category</span>
+                    </footer>
+                </article>
+            </li>
+        </ul>
+        <footer>
+            <a href="#">
+                Read more
+            </a>
+        </footer>
+    </div>-->
+    </div>
+        <div id="calender_event" class="tipp-calender">
+        </div>
+    </div>
+<div id="eventModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Activity Schedule</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table id="eventTBL" style="width: 100%;"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+
+
+    function showModel(event_name, event_desc, event_time, month, year, day, event_duration) {
+        $("#eventTBL").empty();
+        $("#eventTBL").append($("<tr><td class=\"tipp-label\">Activity Type:</td><td>" + event_name + "</td></tr>"));
+        $("#eventTBL").append($("<tr><td class=\"tipp-label\">Unit Name:</td><td>" + event_desc + "</td></tr>"));
+        $("#eventTBL").append($("<tr><td class=\"tipp-label\">Activity Date:</td><td>" + event_time + "</td></tr>"));
+        $("#eventTBL").append($("<tr><td class=\"tipp-label\">Activity Time:</td><td>" + day + " " + month + " " + year + "</td></tr>"));
+        $("#eventTBL").append($("<tr><td class=\"tipp-label\">Activity Duration:</td><td>" + event_duration + "</td></tr>"));
+        $("#eventModel").modal("show");
+    }
+
+    var EventCalender = function (calenderCtrl, eventslist) {
+        this.eventslist = eventslist;
+        this.calenderCtrl = calenderCtrl;
+        this.week_day = null;
+        this.year_months = null;
+        this.current_date = null;
+        this.init();
+    }
+
+    EventCalender.prototype = {
+        init: function () {
+            var obj = this;
+            obj.current_date = new Date();
+            obj.week_day = ['Sun', 'Mon', 'Tue', 'Wes', 'Thu', 'Fri', 'Sat']
+            obj.year_months = [{ Month: 'January', End: 31 }, { Month: 'February', End: 29 }, { Month: 'March', End: 31 }, { Month: 'April', End: 30 },
+            { Month: 'May', End: 31 }, { Month: 'June', End: 30 }, { Month: 'July', End: 31 }, { Month: 'August', End: 31 }, { Month: 'September', End: 30 }, { Month: 'October', End: 31 }, { Month: 'November', End: 30 }, { Month: 'December', End: 31 }];
+
+        },
+        getEventDescription: function (day) {
+            var obj = this;
+            for (var event in obj.eventslist) {
+                if (obj.eventslist[event].EventDay == day) {
+                    return obj.eventslist[event];
+                }
+            }
+
+            return null;
+        },
+        generate: function () {
+            var obj = this,
+                table_calender = $("<table class=\"table table-bordered\">"),
+                table_header = $("<thead></thead>");
+
+            table_calender.append(table_header);
+
+            var row_week_days = $("<tr><th></th><th colspan=\"5\" style=\"text-align: center;\">" + obj.year_months[obj.current_date.getMonth()].Month + " " + obj.current_date.getFullYear() + "</th><th></th></tr>");
+
+            table_header.append(row_week_days);
+
+            //End create the header
+
+            //Start the body
+            var table_body = $("<tbody></tbody>");
+
+            var header_row = $("<tr></tr>");
+
+            for (var day in obj.week_day) {
+                header_row.append($("<td>" + obj.week_day[day] + "</td>"));
+            }
+
+            table_body.append(header_row);
+
+            var prev_date = new Date();
+
+            prev_date.setYear(obj.current_date.getFullYear());
+
+            prev_date.setMonth(obj.current_date.getMonth() - 1);
+
+            prev_date.setDate(obj.year_months[obj.current_date.getMonth() - 1].End);
+
+            var day_rows = "<tr>";
+
+            for (var index = prev_date.getDay(); index >= 0; index--) {
+                day_rows = day_rows + "<td>" + (parseInt(prev_date.getDate().toString()) - index).toString() + "</td>";
+            }
+
+            for (var month_day = 1; month_day <= obj.year_months[obj.current_date.getMonth()].End; month_day++) {
+                obj.current_date.setDate(month_day);
+                if (obj.getEventDescription(month_day) !== null) {
+                    day_rows = day_rows + "<td title=\"Click the block to view activity\" style=\"background-color: #377091; color: white; cursor: pointer;\" onclick=\"showModel('" + obj.getEventDescription(month_day).EventName + "', '"
+                        + obj.getEventDescription(month_day).EventDesc + "', '" + obj.getEventDescription(month_day).EventTime + "', '" + obj.year_months[obj.current_date.getMonth()].Month + "', '"
+                        + obj.current_date.getFullYear() + "', '" + obj.current_date.getDate() + "', '" + obj.getEventDescription(month_day).EventDuration + " hour(s)')\">" + obj.current_date.getDate() + "</td>";
+                }
+                else {
+                    day_rows = day_rows + "<td style=\"background-color: #6d2829; color: white;\">" + obj.current_date.getDate() + "</td>";
+                }
+
+                if (obj.current_date.getDay() == 6) {
+                    day_rows = day_rows + "</tr><tr>";
+                }
+            }
+
+            var remain = 1;
+
+            for (var index = obj.current_date.getDay() + 1; index <= 6; index++) {
+                day_rows = day_rows + "<td>" + remain++ + "</td>";
+            }
+
+            day_rows = day_rows + "</tr>";
+
+            table_body.append($(day_rows));
+
+            table_calender.append(table_body);
+
+            //End the body
+            table_calender.appendTo($(document.getElementById(obj.calenderCtrl)));
+        }
+    }
+
+    $(document).ready(function () {
+
+        $.getJSON("/ModuleActivity/GetStudentScheduleByMemberID?MemberID=" + document.getElementById("MemberID").value + "&Month=" + document.getElementById("Month").value,
+            function (response) {
+                var calender = new EventCalender("calender_event", response);
+                calender.generate();
+            }
+        );
+    });
+</script>

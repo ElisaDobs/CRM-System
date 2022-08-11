@@ -1,0 +1,116 @@
+﻿@model MRTD.Core.Models.LoginModel
+
+@{
+    ViewData["Title"] = "Login";
+    ViewBag.Title = "Login";
+    string errorMessage = string.Empty;
+    if (ViewBag.ErrorMessage != null)
+    {
+        errorMessage = ViewBag.ErrorMessage;
+    }
+}
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
+
+    .tipp-label {
+        color: #377091;
+    }
+
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+    .tipp-error-message
+    {
+        color: red; 
+        width: 100%; 
+        text-align: left;
+    }
+    .tipp-btn-default
+    {
+        width: 140px; 
+        color: #6d2829;
+    }
+    .tipp-redirect-link
+    {
+        color: #377091;
+    }
+    a
+    {
+        color: #377091;
+    }
+</style>
+<div class="tipp-container">
+    <div class="tipp-left-align">
+    </div>
+    <div class="tipp-middle-align">
+        <div>
+            <h4 class="tipp-header">Log In</h4>
+        </div>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="tipp-error-message">
+                @errorMessage
+            </div>
+        }
+
+        @using (Html.BeginForm("MemberLogin", "Login", FormMethod.Post))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Username, new { @class = "tipp-label" })
+                @Html.TextBoxFor(model => model.Username, new { @class = "form-control tipp-input-field", validation = "required" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Password, new { @class = "tipp-label" })
+                @Html.PasswordFor(model => model.Password, new { @class = "form-control tipp-input-field", validation = "required" })
+            </div>
+            <div style="text-align: center; width: 100%;">
+                <input type="submit" value="Log In" class="btn btn-default tipp-btn-default" />
+                <button type="button" class="btn btn-default tipp-btn-default">
+                    @Html.ActionLink("Reset Password", "ChangePassword", "Login")
+                </button>
+            </div>
+            <div>
+                @Html.ActionLink("Forgot your password?", "ForgotPassword", "Login")
+            </div>
+        }
+    </div>
+    <div class="tipp-right-align">
+    </div>
+</div>
+
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-validation-engine.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var form = $(document.getElementsByTagName("form"));
+        form.submit(function (e) {
+            var validate_form = new Form(form);
+
+            if (!validate_form.valid()) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>

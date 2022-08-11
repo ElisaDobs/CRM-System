@@ -1,0 +1,38 @@
+﻿@{ 
+     ViewData["Title"] = "Dash Board";
+    int acad_year = ViewBag.AcademicYear;
+    string mguid = ViewBag.MemGuid;
+}
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<div>
+    <br />
+</div>
+<div ng-app="dashBoardModule">
+    <div ng-controller="dashBoardController">
+        <div id="container">Tipp Academy Dashboard</div>
+        <input type="hidden" id="mguid" value="@mguid" />
+        <input type="hidden" id="acad_year" value="@acad_year" />
+        <script>
+            angular.module('dashBoardModule', [])
+                .controller('dashBoardController', function ($scope, $http) {
+                    $http({
+                        method: "GET",
+                        url: "/SchoolFaculty/GetEnrollemntStatusByAcademicYear?mid=" + document.getElementById("mguid").value + "&year=" + document.getElementById("acad_year").value,
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;' }
+                    }).then(function (response) {
+                                Highcharts.chart("container", {
+                                    xAxis: { categories: response.data.Categories },
+                                    title: { text: 'Program Applicant(s)' },
+                                    series: [{ title: 'Enrollment status', name: 'Enrollment Status Count', data: response.data.Series }]
+                                });
+                       },
+                        function (response) {
+                       }
+                  );
+                });
+        </script>
+    </div>
+</div>

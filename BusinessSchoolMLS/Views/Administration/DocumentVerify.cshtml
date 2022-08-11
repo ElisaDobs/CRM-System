@@ -1,0 +1,78 @@
+﻿
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+@using MRTD.Core.Models;
+
+@{
+    ViewData["Title"] = "Document Verification";
+
+    ApplicationBusinessComponent applicationBusinessComp = new ApplicationBusinessComponent();
+
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+
+    int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(ViewBag.UID);
+
+    int EnrollmentStatusID = applicationBusinessComp.GetEnrollmentStatusByMemberID(MemberID);
+
+    List<RequiredUploadedDocModel> lst_all_documents = applicationBusinessComp.GetUploadedDocumentByMemberID(MemberID);
+}
+<dv>
+    &nbsp;
+</dv>
+<div>
+    <h4 style="color: #6d2829;">Applicant Document(s) Verification</h4>
+</div>
+<div style="width: 100%;">
+    @foreach (var document in lst_all_documents)
+    {
+        @using (Html.BeginForm("DownloadDocuments", "Administration", FormMethod.Post))
+        {
+            <div style="width: 100%; display: inline-block">
+                <div style="width: 30%; display: inline-block;">
+                    <input type="hidden" name="@document.UploadID" value="@document.UploadFileName" />
+                    <label for="@document.UploadID">@document.UploadTypeName:</label>&nbsp;&nbsp;<span>@document.UploadFileName</span>
+                </div>
+                <div style="width: 40%; display: inline-block;">
+                    <button type="submit" class="btn btn-default" style="width: 100px;">Download</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+<div>
+    @using (Html.BeginForm("ApproveMemberEnrollement", "Administration", FormMethod.Post))
+    {
+        <input type="hidden" name="ApproverID" value="@ViewBag.MemGuid" />
+        <input type="hidden" name="ProspectiveID" value="@ViewBag.UID" />
+        <input type="hidden" name="EnrollmentStatusID" value="@EnrollmentStatusID" />
+        <div style="width: 100%; display: inline-block">
+            <div style="width: 40%; display: inline-block;">
+                <span>Approve/Decline documents:</span>&nbsp;&nbsp;
+                <input type="radio" name="Approved" value="1" id="1" />&nbsp;<label for="1">Approve</label>
+                &nbsp;&nbsp;<input type="radio" name="Approved" value="0" id="0" />&nbsp;<label for="0">Decline</label>
+            </div>
+            <div style="display: none; width: 100%;" class="form-group">
+                <label for="DisApproveComments">Comments</label>
+                <textarea class="form-control" name="DisApproveComments" id="DisApproveComments" rows="40" cols="200"></textarea>
+            </div>
+            <div style="width: 100%; text-align: left;">
+                <button type="submit" class="btn btn-default" style="width: 100px;">Submit</button>
+            </div>
+        </div>
+    }
+</div>
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("input[type='radio']").each(function (index) {
+            $(this).bind("click", function () {
+                if ($(this).val() === 0) {
+                    $("#DisApproveComments").show();
+                }
+                else {
+                    $("#DisApproveComments").hide();
+                }
+            });
+        });
+    });
+</script>
+

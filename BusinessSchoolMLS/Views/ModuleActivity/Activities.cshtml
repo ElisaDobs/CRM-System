@@ -1,0 +1,387 @@
+﻿@model MRTD.Core.Models.ModuleActivityModel;
+
+@{
+    ViewData["Title"] = "Module Activity";
+
+    int qual_id = ViewBag.QualID;
+    int fac_id = ViewBag.FacultyID;
+    int mod_id = ViewBag.ModuleID;
+    string mguid = ViewBag.MemGuid;
+
+    MRTD.Core.Models.FacultyQualificationModel facultyQualification = new MRTD.Core.Models.FacultyQualificationModel()
+    {
+        QualificationID = qual_id,
+        FacultyID = fac_id
+    };
+
+    #region "Create user session"
+    MRTD.Core.Common.ApplicationSession session = new MRTD.Core.Common.ApplicationSession();
+    session.Set(mguid, facultyQualification);
+    MRTD.Core.Common.Session.UserSession = session;
+    #endregion
+
+    BusinessSchoolMLS.SchoolBusinessComponent.ModuleActivityBusinessComponent moduleActivityBusinessComponent
+                                                = new BusinessSchoolMLS.SchoolBusinessComponent.ModuleActivityBusinessComponent();
+    BusinessSchoolMLS.SchoolBusinessComponent.FacultyBusinessComponent facultyBusinessComponent
+                                                = new BusinessSchoolMLS.SchoolBusinessComponent.FacultyBusinessComponent();
+    var module_obj = facultyBusinessComponent.GetAllFacultyModuleByQualificationID(qual_id)
+                                             ?.FirstOrDefault(mod => Int32.Parse(mod.ModuleID) == mod_id);
+    var lst_all_module_activities = moduleActivityBusinessComponent.GetAllModuleActivitiesByModuleID(mod_id);
+}
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h4 style="color: #6d2829;">Unit Activities - @module_obj.ModuleName</h4>
+</div>
+
+<div>
+    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-module-activity">Create Unit activity</button>
+</div>
+<div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit Name</th>
+                    <th>Activity Type</th>
+                    <th>Due Date</th>
+                    <th>Time</th>
+                    <th>Duration</th>
+                    <th>Total Mark</th>
+                    <th>Pass Mark</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var module_act in lst_all_module_activities)
+                {
+                <tr>
+                    <td>@module_obj.ModuleName</td>
+                    <td>@module_act.ActivityName</td>
+                    <td>@module_act.ActivityDate.ToString("yyyy-MM-dd")</td>
+                    <td>@module_act.ActivityTime</td>
+                    <td>@module_act.ActivityDuration</td>
+                    <td>@module_act.ActivityTotalMark</td>
+                    <td>@module_act.ActivityPassMark</td>
+                    <td>@Html.ActionLink("Edit", "", "", new { mid = mguid, modid = mod_id, maid = module_act.ModuleActivityID })</td>
+                    @if (module_act.IsOline)
+                    {
+                        <td>@Html.ActionLink("Add Questions", "ModuleActivityQuestion", "OnlineQuestionnaire", new { mid = mguid, maid = module_act.ModuleActivityID })</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="create-module-activity" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create module activity</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("AddModuleActivity", "ModuleActivity", FormMethod.Post))
+                {
+                    <input type="hidden" name="MemberID" value="@mguid" />
+                    <input type="hidden" name="QualificationID" value="@qual_id" />
+                    <input type="hidden" name="FacultyID" value="@fac_id" />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ActivityID)
+                        @Html.DropDownListFor(model => model.ActivityID, Model.ActivitList, new { @class = "form-control", validation = "select" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ModuleID)
+                        @Html.DropDownListFor(model => model.ModuleID, Model.ModuleList, new { @class = "form-control", validation = "select" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ActivityDate)
+                        @Html.TextBoxFor(model => model.ActivityDate, new { @class = "form-control", @type = "date", validation = "date" })
+                    </div>
+                    <div class="form-group" id="div-activity-time">
+                        @Html.LabelFor(model => model.ActivityTime)
+                        @Html.TextBoxFor(model => model.ActivityTime, new { @class = "form-control", @type = "time" })
+                    </div>
+                    <div class="form-group" id="div-activity-duration">
+                        @Html.LabelFor(model => model.ActivityDuration)
+                        @Html.TextBoxFor(model => model.ActivityDuration, new { @type = "number", @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ActivityPassMark)
+                        @Html.TextBoxFor(model => model.ActivityPassMark, new { @class = "form-control", @type = "number", min="0", max="100", validation = "number" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ActivityTotalMark)
+                        @Html.TextBoxFor(model => model.ActivityTotalMark, new { @class = "form-control", @type = "number", min="0", max="100", validation = "number" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AssessorID)
+                        @Html.DropDownListFor(model => model.AssessorID, Model.ActivityAssessors, new { @class = "form-control", validation = "select" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.IsOline)
+                        @Html.CheckBoxFor(model => model.IsOline)
+                    </div>
+                    <div style="width: 100%; text-align: center;">
+                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+<!--<script type="text/javascript" src="~/js/jquery-validation-engine.js"></script>-->
+<script type="text/javascript">
+
+    /*
+ * Author Name :     Tsaleni Dobson Maswanganye
+ * Date        :     2018 - 07 - 06
+ * Description :     Validate madatory fields
+ */
+
+    var SelectField = function (selectCtrl) {
+        this.selectCtrl = selectCtrl;
+        this.attach("change");
+    };
+
+    SelectField.prototype = {
+        attach: function (e) {
+            var obj = this;
+            if (e === "change") {
+                obj.selectCtrl.bind(e, function () {
+                    obj.selectCtrl.parent().find("span").remove();
+                });
+            }
+        },
+        validate: function () {
+            var obj = this;
+            if (obj.selectCtrl.find("option:selected").val() === "0") {
+                obj.selectCtrl.parent().find("span").remove();
+                obj.selectCtrl.parent().find("label").each(function () {
+                    $("<span style='color: red;'> * required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    };
+
+    var RequiredField = function (requiredCtrl) {
+        this.requiredCtrl = requiredCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredCtrl.val() === "") {
+                obj.requiredCtrl.parent().find("span").remove();
+                obj.requiredCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredCtrl.bind(e, function () {
+                    obj.requiredCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var RequiredNumberField = function (requiredNumberCtrl) {
+        this.requiredNumberCtrl = requiredNumberCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredNumberField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredNumberCtrl.val() === "0") {
+                obj.requiredNumberCtrl.parent().find("span").remove();
+                obj.requiredNumberCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredNumberCtrl.bind(e, function () {
+                    obj.requiredNumberCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var RequiredDateField = function (requiredDateCtrl) {
+        this.requiredDateCtrl = requiredDateCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredDateField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredDateCtrl.val() === "") {
+                obj.requiredDateCtrl.parent().find("span").remove();
+                obj.requiredDateCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredDateCtrl.bind(e, function () {
+                    obj.requiredDateCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var RequiredTimeField = function (requiredTimeCtrl) {
+        this.requiredTimeCtrl = requiredTimeCtrl;
+        this.attach("keyup");
+    };
+
+    RequiredTimeField.prototype = {
+        validate: function () {
+            var obj = this;
+            if (obj.requiredTimeCtrl.val() === "") {
+                obj.requiredTimeCtrl.parent().find("span").remove();
+                obj.requiredTimeCtrl.parent().find("label").each(function (index) {
+                    $("<span style='color: red;'> * Required</span>").appendTo($(this));
+                });
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
+        attach: function (e) {
+            var obj = this;
+            if (e === "keyup") {
+                return obj.requiredTimeCtrl.bind(e, function () {
+                    obj.requiredTimeCtrl.parent().find("span").remove();
+                });
+            }
+        }
+    };
+
+    var Form = function (formCtrl) {
+        this.formCtrl = formCtrl;
+        var required_list = new Array();
+        var select_list = new Array();
+        var required_number_list = new Array();
+        var required_date_list = new Array();
+        var required_time_list = new Array();
+        this.formCtrl.find("[validation=required]").each(function (index) {
+            required_list[index] = new RequiredField($(this));
+        });
+        this.formCtrl.find("[validation=select]").each(function (index) {
+            select_list[index] = new SelectField($(this));
+        });
+        this.formCtrl.find("[validation=number]").each(function (index) {
+            required_number_list[index] = new RequiredNumberField($(this));
+        });
+        this.formCtrl.find("[validation=date]").each(function (index) {
+            required_date_list[index] = new RequiredDateField($(this));
+        });
+        this.formCtrl.find("[validation=time]").each(function (index) {
+            required_time_list[index] = new RequiredTimeField($(this));
+        });
+        this.requireList = required_list;
+        this.selectList = select_list;
+        this.required_number_list = required_number_list;
+        this.required_date_list = required_date_list;
+        this.required_time_list = required_time_list;
+    };
+
+    Form.prototype = {
+        valid: function () {
+            var obj = this,
+                is_valid = true;
+            for (var index = 0; index < obj.requireList.length; index++) {
+                if (!obj.requireList[index].validate())
+                    is_valid = false;
+            }
+
+             for (var pIndex = 0; pIndex < obj.selectList.length; pIndex++) {
+                if (!obj.selectList[pIndex].validate()) {
+                    is_valid = false;
+                }
+            }
+
+            for (var nIndex = 0; nIndex < obj.required_number_list.length; nIndex++) {
+                if (!obj.required_number_list[nIndex].validate())
+                    is_valid = false;
+            }
+
+            for (var dIndex = 0; dIndex < obj.required_date_list.length; dIndex++) {
+                if (!obj.required_date_list[dIndex].validate())
+                    is_valid = false;
+            }
+
+            for (var tIndex = 0; tIndex < obj.required_time_list.length; tIndex++) {
+                if (!obj.required_time_list[tIndex].validate())
+                    is_valid = false;
+            }
+
+            return is_valid;
+        }
+    };
+
+    $(document).ready(function () {
+        var form = $(document.getElementsByTagName("form"));
+        form.submit(function (e) {
+            var validate_form = new Form(form);
+
+            if (!validate_form.valid()) {
+                e.preventDefault();
+            }
+        });
+
+        $("#ActivityID").change(function () {
+            var selectedOption = $(this).find("option:selected").val();
+            if (selectedOption === "1") {
+                $("label[for=ActivityDate]").text("Due Date");
+                $("#div-activity-time").hide();
+                $("#div-activity-duration").hide();
+            }
+            else {
+                $("label[for=ActivityDate]").text("Activity Date");
+                $("#div-activity-time").show();
+                $("#div-activity-duration").show();
+            }
+        });
+    });
+
+</script>

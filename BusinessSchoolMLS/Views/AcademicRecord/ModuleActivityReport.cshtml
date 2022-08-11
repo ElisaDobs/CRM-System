@@ -1,0 +1,236 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent
+@using MRTD.Core.Models;
+@using Microsoft.AspNetCore.Mvc;
+
+@{
+    ViewData["Title"] = "Activity Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+    ModuleActivityBusinessComponent moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
+
+    string mguid = ViewBag.MemGuid;
+    var lst_all_activities = moduleActivityBusinessComponent.GetAllActivity();
+    List<MemberModuleActivityModel> lst_all_members = null;
+
+    if (ViewBag.ModuleID != null && ViewBag.ModuleActivityID != null)
+    {
+        string ModuleID = ViewBag.ModuleID;
+        string ModuleActivityID = ViewBag.ModuleActivityID;
+        lst_all_members = moduleActivityBusinessComponent.GetAllMemberByModuleActivityID(Convert.ToInt32(ModuleID), Convert.ToInt32(ModuleActivityID));
+    }
+}
+<style type="text/css">
+    .auto-complete {
+        border-left: 1px solid black;
+        border-bottom: 1px solid black;
+        border-right: 1px solid black;
+        z-index: 1000;
+        position: absolute;
+        background-color: white;
+        height: auto;
+    }
+</style>
+<input type="hidden" id="mid" name="mid" value="@mguid" />
+
+<h4 style="color: #6d2829;">Unit Activity Report</h4>
+
+<div>
+    @using (Html.BeginForm("LoadReport", "AcademicRecord", FormMethod.Post))
+    {
+        <input type="hidden" name="MemberID" id="MemberID" value="@mguid" />
+        <div style="width: 100%; display: inline-block;">
+            <div class="form-group" style="width: 80%; display: inline-block;">
+                <label for="UnitID">Unit Name</label>
+                <input type="hidden" name="UnitID" id="search_value" />
+                <input type="text" id="search_text" class="form-control" autocomplete="off" />
+            </div>
+            <div class="form-group" style="width: 80%; display: inline-block;">
+                <label for="UnitID">Activity</label>
+                <select id="ddlActivity" name="ddlActivity" class="form-control">
+                    @foreach (var activity in lst_all_activities)
+                    {
+                        <option value="@activity.ActivityID">@activity.ActivityName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-info" id="btnSubmit">View Report</button>
+                @if (lst_all_members != null)
+                {
+                    <input type="hidden" id="AdminMemberID" value="@mguid" />
+                    <input type="hidden" id="ModuleID" value="@ViewBag.ModuleID" />
+                    <input type="hidden" id="ActivityID" value="@ViewBag.ModuleActivityID" />
+                    <input type="button" value="Download" id="btnDownload" class="btn btn-info" />
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@if (lst_all_members != null)
+{
+    <div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Unit ID</th>
+                        <th>Activity Type</th>
+                        <th>Activity Mark</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in lst_all_members)
+                    {
+                        <tr>
+                            <td>@member.FirstName</td>
+                            <td>@member.LastName</td>
+                            <td>@member.UnitCode</td>
+                            <td>@member.ActivityName</td>
+                            <td>@member.ActivityMark</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+
+<!--<script src="https://code.jquery.com/jquery-1.10.2.js"></script>-->
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+
+<script type="text/javascript">
+
+    function getLabelHeader(headers) {
+
+        var header_arr = new Array();
+
+        $.each(headers, function (key, value) {
+            header_arr.push({ Value: key, Text: value });
+        });
+
+        return header_arr
+    }
+
+    function contains(sarchedString, searchItem) {
+
+        if (sarchedString.toLowerCase().indexOf(searchItem.toLowerCase()) >= 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function autoComplete(currentCtrl, comparer, headers, jsondata) {
+
+        if ($(currentCtrl).val() != "") {
+
+            var search_value = $(currentCtrl).val();
+            $(currentCtrl).parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+
+            var lst_all_headers = getLabelHeader(headers),
+                div_autocomplete = $(document.createElement("div")),
+                tbl_autocomplete = $(document.createElement("table")),
+                tbl_autocomplete_header = $(document.createElement("thead")),
+                tbl_autocomplete_t_row = $(document.createElement("tr"));
+            div_autocomplete.addClass("auto-complete");
+            tbl_autocomplete.addClass("table");
+            tbl_autocomplete.css("width", "95%");
+            tbl_autocomplete.css("left", "2.5%");
+            tbl_autocomplete.css("position", "relative");
+            tbl_autocomplete_header.append(tbl_autocomplete_t_row);
+            for (var header in lst_all_headers) {
+                var row_th = $("<th>" + lst_all_headers[header].Text + "</th>");
+                tbl_autocomplete_t_row.append(row_th);
+            }
+
+            tbl_autocomplete.append(tbl_autocomplete_header);
+            div_autocomplete.css("width", $(currentCtrl).outerWidth() + "px");
+            div_autocomplete.append(tbl_autocomplete);
+
+            var tbl_body_autocomplete = $(document.createElement("tbody"));
+            var atleast_exist = false;
+            for (var row in jsondata) {
+
+                var tbl_row_autocomplete = $(document.createElement("tr")),
+                    data_row = getLabelHeader(jsondata[row]);
+
+                tbl_row_autocomplete.bind("mouseenter", function (e) {
+                    $(this).css("background-color", "silver");
+                    $(this).css("cursor", "pointer");
+                    $(this).bind("click", function () {
+                        var selected_row = this.getElementsByTagName("td");
+                        document.getElementById("search_value").value = $(selected_row[0]).text();
+                        document.getElementById("search_text").value = $(selected_row[2]).text();
+                        $(this).parent().parent().parent().parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+                    });
+                });
+
+                tbl_row_autocomplete.bind("mouseout", function (e) {
+                    $(this).css("background-color", "");
+                    $(this).unbind("click");
+                });
+                var is_campare = false;
+                var exist = false;
+                for (var key in data_row) {
+                    if (comparer == data_row[key].Value) {
+                        is_campare = contains(data_row[key].Text, search_value);
+                        if (is_campare == true) {
+                            exist = true;
+                        }
+                    }
+                    $("<td>" + data_row[key].Text + "</td>").appendTo(tbl_row_autocomplete);
+                }
+                if (exist == true) {
+                    atleast_exist = exist;
+                    tbl_body_autocomplete.append(tbl_row_autocomplete);
+                }
+            }
+            if (atleast_exist == true) {
+
+                tbl_body_autocomplete.appendTo(tbl_autocomplete);
+
+                $(currentCtrl).parent().append(div_autocomplete);
+            }
+        }
+        else {
+            $(currentCtrl).parent().find(".auto-complete").each(function (index) { $(this).remove(); });
+        }
+    }
+
+    function createForm(memberid, moduleid, activityid) {
+        var downloadForm = $(document.createElement("form"));
+        downloadForm.append($("<input type=\"hidden\" name=\"AdminMemberID\" value=\"" + memberid + "\" />"));
+        downloadForm.append($("<input type=\"hidden\" name=\"ModuleID\" value=\"" + moduleid + "\" />"));
+        downloadForm.append($("<input type=\"hidden\" name=\"ActivityID\" value=\"" + activityid + "\" />"));
+        return downloadForm;
+    }
+
+    $(document).ready(function () {
+        $.getJSON("/SchoolFaculty/GetAllInstitutionModule?mid=" + document.getElementById("mid").value,
+            function (response) {
+                $("#search_text").bind("keyup", function (e) {
+                    var headers = { ID: "#", UnitID: "Unit ID", UnitName: "Unit Name" },
+                        comparer = "UnitName";
+                    autoComplete(this, comparer, headers, response);
+                });
+            });
+
+            $("#btnDownload").bind("click", function () {
+            $.ajax({
+                url: "/AcademicRecord/ReportDownload",
+                type: "post",
+                contentType: 'application/x-www-form-urlencoded',
+                data: createForm($("#AdminMemberID").val(), $("#ModuleID").val(), $("#ActivityID").val()).serialize(),
+                success: function (data) {
+                }
+            }
+            );
+        });
+    });
+</script>

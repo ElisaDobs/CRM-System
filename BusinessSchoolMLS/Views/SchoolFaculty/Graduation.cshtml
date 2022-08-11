@@ -1,0 +1,133 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+@using MRTD.Core.Models;
+
+@{
+    ViewData["Title"] = "Graduations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    FacultyBusinessComponent businessComponent = new FacultyBusinessComponent();
+    List<FacultyQualModel> models = businessComponent.GetAllFacultyQualificationByFacultyID(8);
+}
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
+
+    .tipp-label {
+        color: #377091;
+    }
+
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+    }
+</style>
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">Graduations</h4>
+    </div>
+    <div class="form-group">
+        <label for="drpQualification" class="tipp-label">Tipp Academy Qualification</label>
+        <select name="drpQualification" id="drpQualification" class="form-control tipp-input-field">
+            <option value="0"></option>
+            @foreach (FacultyQualModel faculty in models)
+            {
+                <option value="@faculty.QualificationID">@faculty.QualificationName</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <input type="button" class="btn btn-default tipp-btn-default" id="viewlist" value="View List" />
+    </div>
+    <div class="table-responsive" style="display: none;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>FullName</td>
+                    <td>IDNo</td>
+                    <td>Cell No</td>
+                    <td>Program Name</td>
+                    <td>Program Code</td>
+                    <td>Date Completed</td>
+                </tr>
+            </thead>
+            <tbody id="graduation"></tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#viewlist").bind("click", function () {
+            $.get("/SchoolFaculty/GetAllMemberDueForGraduationQualificationID?qid=" + $("#drpQualification").find("option:selected").val(), function (data) {
+                $("#graduation").html(data);
+                $(".table-responsive").show();
+            });
+        });
+    });
+
+</script>

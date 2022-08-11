@@ -1,0 +1,74 @@
+﻿
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Academic Records";
+
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+    OnlineModuleActivityBusinessComponent onlineModuleActivityBusiness = new OnlineModuleActivityBusinessComponent();
+    string mguid = ViewBag.MemGuid,
+           sguid = ViewBag.StudentGuid,
+           gguid = string.Empty;
+    
+    if (!string.IsNullOrEmpty(sguid))
+    {
+        gguid = sguid;
+    }
+    else
+    {
+        gguid = mguid;
+    }
+    bool IsStudentCheck = loginBusinessComponent.IsStudentCheckByMemberGuid(mguid);
+    int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(gguid);
+    var lst_all_quals_by_member = onlineModuleActivityBusiness.GetAllQualificationAcademicRecordByMemberID(MemberID);
+}
+<dv>
+    &nbsp;
+</dv>
+<div>
+    <h2 style="color: #6d2829;">Academic Records</h2>
+</div>
+<div>
+    @if (!IsStudentCheck)
+    {
+        @using (Html.BeginForm("SearchByStudent", "AcademicRecord", FormMethod.Post))
+        {
+            <input type="hidden" name="MemberID" value="@mguid" />
+            <div class="form-group">
+                <label for="StudentNo" style="color: #377091;">Identity Number</label>
+                <input type="text" name="StudentNo" id="StudentNo" class="form-control" />
+            </div>
+            <div class="form-group">
+                <button type="submit" id="btnSearch" class="btn btn-default" style="color: #6d2829;">Search</button>
+                <button type="reset" id="btnSearch" class="btn btn-default" style="color: #6d2829;">Clear</button>
+            </div>
+        }
+    }
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Name</th>
+                    <th>Program</th>
+                    <th>NQF Level</th>
+                    <th>Year</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member_qual in lst_all_quals_by_member)
+                {
+                    <tr>
+                        <td>@member_qual.UnitCode</td>
+                        <td>@member_qual.QualificationName</td>
+                        <td>@member_qual.QualType</td>
+                        <td>@member_qual.NQLevel</td>
+                        <td>@member_qual.AcademicYear</td>
+                        <td>@Html.ActionLink("View Units", "QualificationAcademicRecord", "AcademicRecord", new { mid = mguid, qid = member_qual.QualificationID, sid = sguid })</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

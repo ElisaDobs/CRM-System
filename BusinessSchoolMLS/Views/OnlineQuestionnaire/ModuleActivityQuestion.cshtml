@@ -1,0 +1,107 @@
+﻿
+@model MRTD.Core.Models.ModuleActivityQuestionModel
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Module Activity Question";
+
+    OnlineModuleActivityBusinessComponent onlineModuleActivityBusinessComponent = new OnlineModuleActivityBusinessComponent();
+    string mguid = ViewBag.MemGuid;
+    int ModuleActivityID = ViewBag.ModuleActivityID;
+    var lst_all_question = onlineModuleActivityBusinessComponent.GetModuleActivityQuestionByModuleActivityID(ModuleActivityID);
+    var lst_all_controls = onlineModuleActivityBusinessComponent.GetAllControlField();
+    var lst_all_question_join_controls = from a in lst_all_question
+                                         join b in lst_all_controls on a.FieldTypeID equals b.FieldTypeID
+                                         select new { a.ActivityQuestionID, a.QuestionName, a.ParentID, b.FieldTypeName };
+}
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h2 style="color: #6d2829;">Unit Online Question(s)</h2>
+</div>
+
+<div>
+    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-question">Add Unit Questions</button>
+</div>
+<div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th># ID</th>
+                    <th>Question</th>
+                    <th>Parent ID</th>
+                    <th>Control Type</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var question in lst_all_question_join_controls)
+                {
+                    <tr>
+                        <td>@question.ActivityQuestionID</td>
+                        <td>@question.QuestionName</td>
+                        <td>@question.ParentID</td>
+                        <td>@question.FieldTypeName</td>
+                        <td><a href="#">Edit</a></td>
+                        <td>@Html.ActionLink("Lookup Answers", "QuestionLookUpAnswer", "OnlineQuestionnaire", new { mid= mguid, qid= question.ActivityQuestionID })</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div id="create-question" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create Question</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("AddModule", "SchoolFaculty", FormMethod.Post))
+                {
+                    <input type="hidden" name="MemberID" value="@mguid" />
+                    <input type="hidden" name="ModuleActivityID" value="@ModuleActivityID" />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.QuestionName)
+                        @Html.TextBoxFor(model => model.QuestionName, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ParentID)
+                        @Html.DropDownListFor(model => model.ParentID, Model.QuestionParent, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FieldTypeID)
+                        @Html.DropDownListFor(model => model.FieldTypeID, Model.FielTypeName, new { @class = "form-control" })
+                    </div>
+                    <div style="width: 100%; text-align: center;">
+                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-default" style="width: 100px;" data-toggle="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('.modal-content').resizable({
+        //alsoResize: ".modal-dialog",
+        minHeight: 300,
+        minWidth: 600
+    });
+    //$('.modal-dialog').draggable();
+
+    $('#create-question').on('show.bs.modal', function () {
+        $(this).find('.modal-body').css({
+            'max-height': '100%'
+        });
+    });
+
+</script>

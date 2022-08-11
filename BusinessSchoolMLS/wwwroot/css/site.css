@@ -1,0 +1,73 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;{
+    margin: 40px;
+    font-family: Arial;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+}
+
+.tipp-control-container
+{
+    display: inline-block;
+    width:100%;
+}
+
+.tipp-control-label {
+    display: inline-block;
+    position: relative;
+    left: 0%;
+    width: 25%;
+    vertical-align: text-top;
+}
+
+.tipp-control-textbox {
+    display: inline-block;
+    position: relative;
+    left: 0%;
+    width: 60%;
+}
+    
+.tipp-control-textbox > input
+{
+    width: 150px;
+}
+.tipp-control-button {
+        width: 50px;
+        text-align: center;
+}
+.tipp-footer {
+    left: 20%;
+    position: relative;
+    color: #6d2829;
+    width: 75%;
+}

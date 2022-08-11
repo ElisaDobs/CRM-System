@@ -1,0 +1,44 @@
+﻿@using MRTD.Core.Common;
+@using MRTD.Core.Models;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+@{
+    ViewData["Title"] = "Staff Members";
+    ApplicationBusinessComponent application = new ApplicationBusinessComponent();
+    var membersProfiles = default(List<MemberProfileModel>);
+    if (Session.AppSession.ContainsKey("MemberID"))
+    {
+        membersProfiles = application.GetAllStaffMemberByClientId(Session.AppSession["ClientId"].ToString());
+    }
+}
+<div>
+    &nbsp;
+</div>
+<h4>Staff Members</h4>
+<div>
+    &nbsp;
+</div>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Identity No</th>
+                <th>Full Name</th>
+                <th>Cell No</th>
+                <th>E-mail</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var member in membersProfiles)
+            {
+            <tr>
+                <td>@member.IDNo</td>
+                <td>@string.Format("{0} {1}", member.FirstName, member.LastName)</td>
+                <td>@member.CellNo</td>
+                <td>@member.EmailAddress</td>
+                <td>@member.Role</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

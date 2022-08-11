@@ -1,0 +1,178 @@
+﻿
+@model MRTD.Core.Models.QualificationModel;
+@using MRTD.Core.Common;
+
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Programs";
+    var faculty_component = new FacultyBusinessComponent();
+    string mguid = ViewBag.MemGuid;
+    int fac_id = ViewBag.FacultyID;
+    var lst_all_fac_quals = faculty_component.GetAllFacultyQualificationByFacultyID(fac_id);
+    var faculty = faculty_component.GetAllBusinessFaculty(Session.AppSession["ClientId"].ToString()).First(fac => fac.FacultyID == fac_id);
+}
+
+<div>
+    &nbsp;
+</div>
+<div>
+    <h2 style="color: #6d2829;">Programs - @faculty.FacultyName</h2>
+</div>
+
+<div>
+    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-qualification">Add Program</button>
+</div>
+<div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Name</th>
+                    <th>Program</th>
+                    <th>NQF Level</th>
+                    <th>Credits</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fac_qual in lst_all_fac_quals)
+                {
+                    <tr>
+                        <td>@fac_qual.UnitCode</td>
+                        <td>@fac_qual.QualificationName</td>
+                        <td>@fac_qual.QualificationType</td>
+                        <td>@fac_qual.QualificationNQLevel</td>
+                        <td>@fac_qual.Credit</td>
+                        <td><a href="#" data-toggle="modal" data-target="#@fac_qual.UnitCode">Edit</a></td>
+                        <td>@Html.ActionLink("Add Unit", "FacultyModule", "SchoolFaculty", new { mid = mguid, fid = fac_id, qid = fac_qual.QualificationID })</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div>
+    @foreach (var fac_qual in lst_all_fac_quals)
+    {
+        <div id="@fac_qual.UnitCode" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        @using (Html.BeginForm("EditProgram", "SchoolFaculty", FormMethod.Post))
+                        {
+                            <input type="hidden" name="MemberID" value="@mguid" />
+                            <input type="hidden" name="FacultyID" value="@fac_id" />
+                            <input type="hidden" name="QualificationID" value="@fac_qual.QualificationID" />
+                            <div class="form-group">
+                                <label for="QualTypeID">Program</label>
+                                <select class="form-control" name="QualTypeID">
+                                    @foreach (var ml in Model.QualificationTypes)
+                                    {
+                                        if (int.Parse(ml.Value) == fac_qual.QualificationTypeID)
+                                        {
+                                            <option value="@ml.Value" selected="selected">@ml.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@ml.Value">@ml.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="QualificationName">Name</label>
+                                <input type="text" name="QualificationName" class="form-control" value="@fac_qual.QualificationName" />
+                            </div>
+                            <div class="form-group">
+                                <label for="QualificationDescription">Description</label>
+                                <textarea name="QualificationDescription" class="form-control">@fac_qual.QualificationDescription</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="QualificationUnitCode">Unit ID</label>
+                                <input type="text" name="QualificationUnitCode" class="form-control" value="@fac_qual.UnitCode" />
+                            </div>
+                            <div class="form-group">
+                                <label for="NQLevelID">NQF Level</label>
+                                <select name="NQLevelID" class="form-control">
+                                    @foreach (var mo in Model.QualificationNQLevel)
+                                    {
+                                        if (int.Parse(mo.Value) == fac_qual.QualificationNQLevel)
+                                        {
+                                            <option value="@mo.Value" selected="selected">@mo.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@mo.Value">@mo.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Credit">Credit</label>
+                                <input type="number" name="Credit" class="form-control" value="@fac_qual.Credit" />
+                            </div>
+                            <div style="width: 100%; text-align: center;">
+                                <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>&nbsp;&nbsp;
+                                <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div id="create-qualification" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create Program</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("AddQualification", "SchoolFaculty", FormMethod.Post))
+                {
+                    <input type="hidden" name="MemberID" value="@mguid" />
+                    <input type="hidden" name="FacultyID" value="@fac_id" />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.QualTypeID)
+                        @Html.DropDownListFor(model => model.QualTypeID, Model.QualificationTypes, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.QualificationName)
+                        @Html.TextBoxFor(model => model.QualificationName, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.QualificationDescription)
+                        @Html.TextAreaFor(model => model.QualificationDescription, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.QualificationUnitCode)
+                        @Html.TextBoxFor(model => model.QualificationUnitCode, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.NQLevelID)
+                        @Html.DropDownListFor(model => model.NQLevelID, Model.QualificationNQLevel, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Credit)
+                        @Html.TextBoxFor(model => model.Credit, new { @class = "form-control", @type="number" })
+                    </div>
+                    <div style="width: 100%; text-align: center;">
+                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>&nbsp;&nbsp;
+                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

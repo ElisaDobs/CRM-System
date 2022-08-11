@@ -1,0 +1,45 @@
+﻿
+@{
+    ViewData["Title"] = "Module Allocation";
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<h2>Module Allocation</h2>
+
+<div ng-app="dashBoardModule">
+    <div ng-controller="dashBoardController">
+        <div class="form-group">
+            <label for="">Level module(s)</label>&nbsp;&nbsp;
+            <select name="drpLevel" id="drpLevel" class="form-control">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div style="width: 100%; display: inline-block;">
+            <div class="form-group" style="width: 30%; display: inline-block;">
+                <select name="levelModule" class="form-control" multiple></select>
+            </div>
+            <div style="width: 10%; display: inline-block; text-align: center; vertical-align: top;">
+                <div>
+                    <button type="button" class="btn btn-primary" style="width: 100px;">Add</button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" style="width: 100px;">Remove</button>
+                </div>
+            </div>
+            <div class="form-group" style="width: 30%; display: inline-block;">
+                <select name="levelModuleAllocate" class="form-control" multiple></select>
+            </div>
+        </div>
+        <div style="width: 100%; text-align: center;">
+            <button type="button" class="btn btn-primary" style="width: 100px;">Save</button>
+            <button type="button" class="btn btn-primary" style="width: 100px;">Cancel</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+</script>

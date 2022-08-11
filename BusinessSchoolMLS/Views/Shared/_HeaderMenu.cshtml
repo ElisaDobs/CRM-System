@@ -1,0 +1,180 @@
+﻿
+@using MRTD.Core.Common;
+@using BusinessSchoolMLS.SchoolBusinessComponent
+
+@{
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+    AdministratorBusinessComponent administratorBusinessComponent = new AdministratorBusinessComponent();
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+    List<MRTD.Core.Models.MenuModel> lst_all_menus = null; //default(List<MRTD.Core.Models.MenuModel>);
+    string mid = string.Empty;
+    if (ViewBag.Title != "Login")
+    {
+        if (ViewBag.MemGuid != null)
+        {
+            mid = ViewBag.MemGuid;
+            int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+            lst_all_menus = administratorBusinessComponent.GetMenuListByNemberID(MemberID);
+        }
+    }
+}
+
+<style type="text/css">
+
+    .dropdown-submenu {
+        position: relative;
+    }
+
+        .dropdown-submenu > .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -6px;
+            margin-left: -1px;
+            -webkit-border-radius: 0 6px 6px 6px;
+            -moz-border-radius: 0 6px 6px;
+            border-radius: 0 6px 6px 6px;
+        }
+
+        .dropdown-submenu:hover > .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-submenu > a:after {
+            display: block;
+            content: " ";
+            float: right;
+            width: 0;
+            height: 0;
+            border-color: transparent;
+            border-style: solid;
+            border-width: 5px 0 5px 5px;
+            border-left-color: #ccc;
+            margin-top: 5px;
+            margin-right: -10px;
+        }
+
+        .dropdown-submenu:hover > a:after {
+            border-left-color: #fff;
+        }
+
+        .dropdown-submenu.pull-left {
+            float: none;
+        }
+
+            .dropdown-submenu.pull-left > .dropdown-menu {
+                left: -100%;
+                margin-left: 10px;
+                -webkit-border-radius: 6px 0 6px 6px;
+                -moz-border-radius: 6px 0 6px 6px;
+                border-radius: 6px 0 6px 6px;
+            }
+</style>
+
+@if (ViewBag.Title != "Login")
+{
+    @if (lst_all_menus != null)
+    {
+        <ul class="nav navbar-nav" role="menu" aria-labelledby="dropdownMenu" style="z-index: 100;">
+            @foreach (var super_menu in lst_all_menus)
+            {
+                var lst_all_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(super_menu.MenuID);
+                <li>
+                    <a asp-area="" asp-controller="#" asp-action="#" class="dropdown-toggle" data-toggle="dropdown" style="color: #377091;">@super_menu.MenuName</a>
+                    <span class="caret" style="color: #377091;"></span>
+
+                    @if (super_menu.MenuID == 2)
+                    {
+                        var lst_all_colleges = facultyBusinessComponent.GetAllBusinessFaculty(Session.AppSession["ClientId"].ToString());
+                        <ul class="dropdown-menu">
+                            @foreach (var college in lst_all_colleges)
+                            {
+                                var lst_all_programs = facultyBusinessComponent.GetAllFacultyQualificationByFacultyID(college.FacultyID);
+                                if (lst_all_programs.Count() != 0)
+                                {
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="#" style="color: #377091;">@college.FacultyName</a>
+                                        <ul class="dropdown-menu">
+                                            @foreach (var sub_program in lst_all_programs)
+                                            {
+                                                <li style="color: #377091;">
+                                                    @Html.ActionLink(sub_program.QualificationName, "LearningProgram", "SchoolFaculty", new { mid = mid, pid = sub_program.QualificationID, fid = college.FacultyID }, new { @style = "color: #377091;", @tabindex = "-1" })
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li style="color: #377091;">
+                                        @Html.ActionLink(college.FacultyName, "LearningProgram", "SchoolFaculty", new { mid = mid, fid = college.FacultyID }, new { @style = "color: #377091;", @tabindex = "-1" })
+                                    </li>
+                                }
+
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="dropdown-menu">
+                            @foreach (var menu in lst_all_sub_menus)
+                            {
+                                if (menu.ActivityID != 0)
+                                {
+                                    if (menu.MenuID == 8)
+                                    {
+                                        var lst_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(menu.MenuID);
+                                        <li class="dropdown-submenu">
+                                            <a tabindex="-1" href="#" style="color: #377091;">@menu.MenuName</a>
+                                            <ul class="dropdown-menu">
+                                                @foreach (var sub_menu in lst_sub_menus)
+                                                {
+                                                    <li style="color: #377091;">
+                                                        @Html.ActionLink(sub_menu.MenuName, sub_menu.ActionName, sub_menu.ControllerName, new { mid = mid, actid = sub_menu.ActivityID }, new { @style = "color: #377091;", @tabindex = "-1" })
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li style="color: #377091;">
+                                            @Html.ActionLink(menu.MenuName, menu.ActionName, menu.ControllerName, new { mid = mid, actid = menu.ActivityID }, new { @style = "color: #377091;" })
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    if (menu.MenuID == 8 || menu.MenuID == 4 || menu.MenuID == 7)
+                                    {
+                                        var lst_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(menu.MenuID);
+                                        <li class="dropdown-submenu">
+                                            <a tabindex="-1" href="#" style="color: #377091;">@menu.MenuName</a>
+                                            <ul class="dropdown-menu">
+                                                @foreach (var sub_menu in lst_sub_menus)
+                                                {
+                                                    <li style="color: #377091;">
+                                                        @Html.ActionLink(sub_menu.MenuName, sub_menu.ActionName, sub_menu.ControllerName, new { mid = mid }, new { @style = "color: #377091;", @tabindex = "-1" })
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li style="color: #377091;">
+                                            @Html.ActionLink(menu.MenuName, menu.ActionName, menu.ControllerName, new { mid = mid }, new { @style = "color: #377091;" })
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    <div style="float: right; top: 10px; vertical-align: middle; height: 50px;">
+        <button type="button" class="btn btn-default" style="color: #377091;">@Html.ActionLink("Log out", "LogOut", "Login", new { mid = mid })</button>
+    </div>
+}
+

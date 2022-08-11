@@ -1,0 +1,17 @@
+﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ViewData["Title"] = "Home";
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+    string mem_guid = ViewBag.MemGuid;
+
+    bool IsStudent = loginBusinessComponent.IsStudentCheckByMemberGuid(mem_guid);
+}
+@if (!IsStudent)
+{
+    @Html.Partial("BusinessSchoolDashBoard")
+}
+else
+{
+    @Html.Partial("StudentDashBoard")
+}
