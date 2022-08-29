@@ -1,7 +1,7 @@
 ﻿/*
-     Author Name :     Tsaleni Dobson Maswanganye
-     Date        :     2018 - 07 - 06
-     Description :     Validate madatory fields
+Author Name :     Tsaleni Dobson Maswanganye
+Date        :     2018 - 07 - 06
+Description :     Validate madatory fields
 */
 
 var SelectField = function (selectCtrl) {

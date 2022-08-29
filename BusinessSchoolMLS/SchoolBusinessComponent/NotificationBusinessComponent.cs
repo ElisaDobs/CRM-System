@@ -40,5 +40,46 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 throw exception;
             }
         }
+
+         public bool InsertWebPushNotification(string PushType, string PushTitle, string PushText, int MemberId)
+         {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.ReturnType = DataReturnType.NonQuery;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter.Set("PushType", PushType);
+                model.ApplicationParameter.Set("PushTitle", PushTitle);
+                model.ApplicationParameter.Set("PushText", PushText);
+                model.ApplicationParameter.Set("MemberId", MemberId);
+
+                int Count = (int)CommonDataAccess.Process(model);
+                return Count > 0;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+         }
+
+        public PushWebNotification GetWebPushNotificationByMemberId(int MemberId)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.ReturnType = DataReturnType.Fill;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter.Set("MemberId", MemberId);
+                List<PushWebNotification> pushwebnotice = (List<PushWebNotification>)CommonDataAccess.Process<PushWebNotification>(model);
+
+                return pushwebnotice.FirstOrDefault();
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
     }
 }

@@ -11,20 +11,118 @@
     var lst_all_qual_modules = faculty_component.GetAllFacultyModuleByQualificationID(qual_id);
 
 }
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
 
-<div>
-    &nbsp;
-</div>
-<div>
-    <h2 style="color: #6d2829;">Program Unit - @fac_qual.QualificationName</h2>
-</div>
+    .tipp-label {
+        color: #377091;
+    }
 
-<div>
-    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-module">Add Unit</button>
-</div>
-<div>
-    <div class="table-responsive">
-        <table class="table">
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+        width: 75%;
+    }
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    a {
+        color: #ffffff;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+</style>
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">Program Unit - @fac_qual.QualificationName</h4>
+    </div>
+    <div>
+        <table id="tippConnectProgramUnitTable" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>Unit ID</th>
@@ -47,8 +145,14 @@
                         <td>@qual_module.NQLevelID</td>
                         <td>@qual_module.Credit</td>
                         <td>@qual_module.AcademicLevelID</td>
-                        <td><a href="#" data-toggle="modal" data-target="#@qual_module.ModuleUnitCode">Edit</a></td>
-                        <td>@Html.ActionLink("Activity", "activities", "ModuleActivity", new { mid = mguid, modid = qual_module.ModuleID, qid = qual_id, fid = fac_id })</td>
+                        <td>
+                            <button type="button" class="btn btn-default tipp-custom-grid-button" data-toggle="modal" data-target="#@qual_module.ModuleUnitCode">
+                                <span class="glyphicon glyphicon-edit"></span> Edit
+                            </button>
+                        </td>
+                        <td>
+                            @Html.ActionLink("Activity", "activities", "ModuleActivity", new { mid = mguid, modid = qual_module.ModuleID, qid = qual_id, fid = fac_id }, new { @class= "tipp-redirect-link" })
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -62,8 +166,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Edit Unit</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title tipp-header">Edit Unit</h4>
                 </div>
                 <div class="modal-body">
                     @using (Html.BeginForm("EditModule", "SchoolFaculty", FormMethod.Post))
@@ -83,10 +187,6 @@
                         <div class="form-group">
                             <label for="ModuleUnitCode">Unit ID</label>
                             <input type="text" name="ModuleUnitCode" class="form-control" value="@qual_module.ModuleUnitCode" />
-                        </div>
-                        <div class="form-group">
-                            <label for="StockPrice">Module Price</label>
-                            <input type="text" name="StockPrice" class="form-control" value="@qual_module.StockPrice" />
                         </div>
                         <div class="form-group">
                             <label for="NQLevelID">NQF Level</label>
@@ -129,8 +229,8 @@
                             </select>
                         </div>
                         <div style="width: 100%; text-align: center;">
-                            <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
-                            <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-toggle="modal">Save</button>
+                            <button type="button" class="btn btn-primary tipp-custom-button"" style="width: 100px;" data-dismiss="modal">Cancel</button>
                         </div>
                     }
                 </div>
@@ -140,7 +240,7 @@
 }
 
 
-<div id="create-module" class="modal fade">
+<div id="CreateUnitForm" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -182,11 +282,26 @@
                         @Html.DropDownListFor(model => model.AcademicLevelID, Model.ModuleNQLevels, new { @class = "form-control" })
                     </div>
                     <div style="width: 100%; text-align: center;">
-                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
-                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-primary tipp-custom-button" data-dismiss="modal">Cancel</button>
                     </div>
                 }
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#tippConnectProgramUnitTable").DataTable({
+            dom: 'Bfrtip',
+            buttons: [{
+                text: "Add Unit"
+            }]
+        });
+
+        $("button.dt-button").attr("data-toggle", "modal");
+        $("button.dt-button").attr("data-target", "#CreateUnitForm");
+        $("button.dt-button").addClass("tipp-custom-button");
+    });
+</script>

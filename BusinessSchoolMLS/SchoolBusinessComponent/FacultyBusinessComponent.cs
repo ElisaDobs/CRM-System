@@ -254,7 +254,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
             try
             {
                 ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
-                model.ReturnType = DataReturnType.Scalar;
+                model.ReturnType = DataReturnType.NonQuery;
                 model.CommandType = CommandType.StoredProcedure;
                 model.ApplicationParameter = qualificationModel.MappingParameters();
                 int Count = (int)CommonDataAccess.Process(model);

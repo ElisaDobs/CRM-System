@@ -14,7 +14,7 @@ namespace MailTest
     {
         static void Main(string[] args)
         {
-            string connectionString = @"Data Source=10.0.0.82;Connection Timeout=10;Initial Catalog=TippConnectDB;User ID=tippconnect;Password=Password03;MultipleActiveResultSets=True";
+            string connectionString = @"Data Source=SAGJHBNB43ZVHM2\SQLExpress; Database=UniversityDB; Trusted_Connection=True; MultipleActiveResultSets=true";
 
             //string emailPassword = "Hw5HQneVwhjg1YhdngEJ+oBo7TZJGydZfa6mZHNWmJU=";
             string emailPassword = "married&*1";

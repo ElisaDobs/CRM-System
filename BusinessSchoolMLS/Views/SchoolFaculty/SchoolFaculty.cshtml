@@ -88,10 +88,10 @@
 </style>
 <div class="tipp-top-heading">
     <div>
-        <h4 class="tipp-header">Tipp Academy Programs</h4>
+        <h4 class="tipp-header">Tipp Connect Programs</h4>
     </div>
-    <div class="table-responsive">
-        <table class="table">
+    <div>
+        <table id="tippProgramTable" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>Program ID</th>
@@ -107,10 +107,15 @@
                         <td>@faculty.FacultyID</td>
                         <td>@faculty.FacultyName</td>
                         <td>@faculty.FacultyDescription</td>
-                        <td>@Html.ActionLink("Add Program", "FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = faculty.FacultyID })</td>
+                        <td align="center">@Html.ActionLink("Add Program", "FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = faculty.FacultyID })</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#tippProgramTable").DataTable({});
+    });
+</script>

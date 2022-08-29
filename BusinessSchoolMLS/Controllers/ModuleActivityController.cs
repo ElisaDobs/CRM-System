@@ -20,6 +20,15 @@ namespace BusinessSchoolMLS.Controllers
 {
     public class ModuleActivityController : Controller
     {
+        private readonly ModuleActivityBusinessComponent _moduleActivityBusinessComponent;
+        private readonly LoginBusinessComponent _loginBusinessComponent;
+        private readonly NotificationBusinessComponent _notificationBusinessComponent;
+        public ModuleActivityController()
+        {
+            _moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
+            _notificationBusinessComponent = new NotificationBusinessComponent();
+            _loginBusinessComponent = new LoginBusinessComponent();
+        }
         // GET: /<controller>/
         public IActionResult Index()
         {
@@ -30,9 +39,8 @@ namespace BusinessSchoolMLS.Controllers
         {
             try
             {
-                if (!string.IsNullOrEmpty(HttpContext.Request.Query["mid"]))
+                if (!string.IsNullOrEmpty(HttpContext.Request.Query["mid"].ToString()))
                 {
-                    ViewBag.MemGuid = HttpContext.Request.Query["mid"].ToString();
                     if (!string.IsNullOrEmpty(HttpContext.Request.Query["qid"]))
                     {
                         ViewBag.QualID = Int32.Parse(HttpContext.Request.Query["qid"]);
@@ -68,16 +76,57 @@ namespace BusinessSchoolMLS.Controllers
             return View(moduleActivityModel);
         }
 
-        public IActionResult AddModuleActivity([FromForm]ModuleActivityModel moduleActivityModel)
+        public IActionResult UpdateUnitActivity([FromForm] ModuleActivityModel moduleActivityModel)
         {
+            string mguid = string.Empty;
+            int member_id = 0;
             try
             {
-                ModuleActivityBusinessComponent moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
-                moduleActivityBusinessComponent.SaveModuleActivity(moduleActivityModel);
+                if (Session.AppSession.ContainsKey("MemberID"))
+                {
+                    mguid = Session.AppSession["MemberID"].ToString();
+                }
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
+                _moduleActivityBusinessComponent.UpdateModuleActivity(
+                                                                        moduleActivityModel.ModuleActivityID,
+                                                                        moduleActivityModel.ModuleID,
+                                                                        moduleActivityModel.ActivityID,
+                                                                        moduleActivityModel.ActivityDate,
+                                                                        moduleActivityModel.ActivityTime,
+                                                                        moduleActivityModel.ActivityDuration,
+                                                                        moduleActivityModel.ActivityPassMark,
+                                                                        moduleActivityModel.ActivityTotalMark,
+                                                                        mguid,
+                                                                        moduleActivityModel.AssessorID
+                                                                     );
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Connect Unit Activity", "Unit Activity has been successfully updated.", member_id);
+            }
+            catch(Exception exception)
+            {
+                LogMessageBusinessComponent.InsertLogMessage(moduleActivityModel.MemberID, MessageNode.SYS_MODULE_ACTIVITY_UPDATE_ERROR, exception.ToString());
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Connect Unit Activity", "Unit Activity has been unsuccessfully updated.", member_id);
+            }
+            return RedirectToAction("Activities", new { mid = mguid, modid = moduleActivityModel.ModuleID });
+        }
+
+        public IActionResult AddModuleActivity([FromForm]ModuleActivityModel moduleActivityModel)
+        {
+            string mguid = string.Empty;
+            int member_id = 0;
+            try
+            {
+                if (Session.AppSession.ContainsKey("MemberID"))
+                {
+                    mguid = Session.AppSession["MemberID"].ToString();
+                }
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
+                _moduleActivityBusinessComponent.SaveModuleActivity(moduleActivityModel);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Connect Unit Activity", "Unit Activity has been successfully created.", member_id);
             }
             catch (Exception exception)
             {
                 LogMessageBusinessComponent.InsertLogMessage(moduleActivityModel.MemberID, MessageNode.SYS_MODULE_ACTIVITY_CREATE_ERROR, exception.ToString());
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Connect Unit Activity", "Unit Activity has been unsuccessfully created.", member_id);
             }
 
             return RedirectToAction("Activities", new { mid = moduleActivityModel.MemberID, modid = moduleActivityModel.ModuleID });

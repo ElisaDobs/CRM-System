@@ -18,7 +18,7 @@
     &nbsp;
 </div>
 <div class="table-responsive">
-    <table class="table">
+    <table id="tippUserTable" class="table">
         <thead>
             <tr>
                 <th>Identity No</th>
@@ -42,3 +42,10 @@
         </tbody>
     </table>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $("#tippUserTable").DataTable();
+    });
+</script>

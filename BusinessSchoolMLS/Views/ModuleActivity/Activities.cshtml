@@ -1,4 +1,5 @@
 ﻿@model MRTD.Core.Models.ModuleActivityModel;
+@using MRTD.Core.Common; 
 
 @{
     ViewData["Title"] = "Module Activity";
@@ -6,7 +7,7 @@
     int qual_id = ViewBag.QualID;
     int fac_id = ViewBag.FacultyID;
     int mod_id = ViewBag.ModuleID;
-    string mguid = ViewBag.MemGuid;
+    string mguid = Session.AppSession.Get("MemberID").ToString();
 
     MRTD.Core.Models.FacultyQualificationModel facultyQualification = new MRTD.Core.Models.FacultyQualificationModel()
     {
@@ -28,20 +29,116 @@
                                              ?.FirstOrDefault(mod => Int32.Parse(mod.ModuleID) == mod_id);
     var lst_all_module_activities = moduleActivityBusinessComponent.GetAllModuleActivitiesByModuleID(mod_id);
 }
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
 
-<div>
-    &nbsp;
-</div>
-<div>
-    <h4 style="color: #6d2829;">Unit Activities - @module_obj.ModuleName</h4>
-</div>
+    .tipp-label {
+        color: #377091;
+    }
 
-<div>
-    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-module-activity">Create Unit activity</button>
-</div>
-<div>
-    <div class="table-responsive">
-        <table class="table">
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+        width: 75%;
+    }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    a {
+        color: #ffffff;
+    }
+    label {
+        color: #377091 !important;
+    }
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+    .tipp-redirect-link {
+        color: #377091;
+    }
+</style>
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">Program Unit Activity - @module_obj.ModuleName</h4>
+    </div>
+    <div>
+        <table id="tippConnectUnitActivityTable" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>Unit Name</th>
@@ -58,39 +155,137 @@
             <tbody>
                 @foreach (var module_act in lst_all_module_activities)
                 {
-                <tr>
-                    <td>@module_obj.ModuleName</td>
-                    <td>@module_act.ActivityName</td>
-                    <td>@module_act.ActivityDate.ToString("yyyy-MM-dd")</td>
-                    <td>@module_act.ActivityTime</td>
-                    <td>@module_act.ActivityDuration</td>
-                    <td>@module_act.ActivityTotalMark</td>
-                    <td>@module_act.ActivityPassMark</td>
-                    <td>@Html.ActionLink("Edit", "", "", new { mid = mguid, modid = mod_id, maid = module_act.ModuleActivityID })</td>
-                    @if (module_act.IsOline)
-                    {
-                        <td>@Html.ActionLink("Add Questions", "ModuleActivityQuestion", "OnlineQuestionnaire", new { mid = mguid, maid = module_act.ModuleActivityID })</td>
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
-                </tr>
+                    <tr>
+                        <td>@module_obj.ModuleName</td>
+                        <td>@module_act.ActivityName</td>
+                        <td>@module_act.ActivityDate.ToString("yyyy-MM-dd")</td>
+                        <td>@module_act.ActivityTime</td>
+                        <td>@module_act.ActivityDuration</td>
+                        <td>@module_act.ActivityTotalMark</td>
+                        <td>@module_act.ActivityPassMark</td>
+                        <td align="center">
+                            <button type="button" class="btn btn-default btn-sm tipp-custom-grid-button" data-toggle="modal" data-target="#@module_act.ModuleActivityID">
+                                <span class="glyphicon glyphicon-edit"></span> Edit
+                            </button>
+                        </td>
+                        @if (module_act.IsOline)
+                        {
+                            <td>@Html.ActionLink("Add Questions", "ModuleActivityQuestion", "OnlineQuestionnaire", new { mid = mguid, maid = module_act.ModuleActivityID })</td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    </tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
 
-<div id="create-module-activity" class="modal fade">
+@foreach (var activity in lst_all_module_activities)
+{
+    <div id="@activity.ModuleActivityID" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title tipp-header">Edit Activity</h4>
+                </div>
+                <form action="/ModuleActivity/UpdateUnitActivity" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="MemberID" value="@mguid" />
+                        <input type="hidden" name="QualificationID" value="@qual_id" />
+                        <input type="hidden" name="FacultyID" value="@fac_id" />
+                        <input type="hidden" name="ModuleActivityID" value="@activity.ModuleActivityID" />
+                        <div class="form-group">
+                            <label for="ActivityID" class="tipp-label">Activity Type</label>
+                            <select name="ActivityID" class="form-control" validation="select">
+                                @foreach (var act in Model.ActivitList)
+                                {
+                                    if (act.Text == activity.ActivityName)
+                                    {
+                                        <option value="@act.Value" selected="selected">@act.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@act.Value">@act.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ModuleID" class="tipp-label">Program Unit</label>
+                            <select name="ModuleID" class="form-control" validation="select">
+                                @foreach (var module in Model.ModuleList)
+                                {
+                                    if (Convert.ToInt32(module.Value.ToString()) == activity.ModuleID)
+                                    {
+                                        <option value="@module.Value" selected="selected">@module.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@module.Value">@module.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ModuleID" class="tipp-label">Date</label>
+                            <input type="date" name="ActivityDate" class="form-control" validation="required" value="@activity.ActivityDate.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="form-group" id="div-activity-time">
+                            <label for="ActivityTime" class="tipp-label">Time</label>
+                            <input type="time" name="ActivityTime" class="form-control" validation="required" value="@activity.ActivityTime" />
+                        </div>
+                        <div class="form-group" id="div-activity-duration">
+                            <label for="ActivityDuration" class="tipp-label">Duration</label>
+                            <input type="number" name="ActivityDuration" class="form-control" validation="required" value="@activity.ActivityDuration" />
+                        </div>
+                        <div class="form-group">
+                            <label for="ActivityPassMark" class="tipp-label">Pass Mark</label>
+                            <input type="number" name="ActivityPassMark" class="form-control" validation="required" value="@activity.ActivityPassMark" />
+                        </div>
+                        <div class="form-group">
+                            <label for="ActivityTotalMark" class="tipp-label">Total Mark</label>
+                            <input type="number" name="ActivityTotalMark" class="form-control" validation="required" value="@activity.ActivityTotalMark" />
+                        </div>
+                        <div class="form-group">
+                            <label for="AssessorID" class="tipp-label">Assessor</label>
+                            <select name="AssessorID" class="form-control" validation="select">
+                                @foreach (var assessor in Model.ActivityAssessors)
+                                {
+                                    if (Convert.ToInt32(assessor.Value.ToString()) == activity.AssessorID)
+                                    {
+                                        <option value="@assessor.Value" selected="selected">@assessor.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@assessor.Value">@assessor.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="width: 100%; text-align: center;">
+                        <button type="submit" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<div id="CreatePrograomUnitActivityForm" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Create module activity</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title tipp-header">Create Unit Activity</h4>
             </div>
             <div class="modal-body">
-                @using (Html.BeginForm("AddModuleActivity", "ModuleActivity", FormMethod.Post))
+                @using (Html.BeginForm("AddModuleActivity", "ModuleActivity", FormMethod.Post, new { id="CreateActivityForm" }))
                 {
                     <input type="hidden" name="MemberID" value="@mguid" />
                     <input type="hidden" name="QualificationID" value="@qual_id" />
@@ -117,11 +312,11 @@
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(model => model.ActivityPassMark)
-                        @Html.TextBoxFor(model => model.ActivityPassMark, new { @class = "form-control", @type = "number", min="0", max="100", validation = "number" })
+                        @Html.TextBoxFor(model => model.ActivityPassMark, new { @class = "form-control", @type = "number", min = "0", max = "100", validation = "number" })
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(model => model.ActivityTotalMark)
-                        @Html.TextBoxFor(model => model.ActivityTotalMark, new { @class = "form-control", @type = "number", min="0", max="100", validation = "number" })
+                        @Html.TextBoxFor(model => model.ActivityTotalMark, new { @class = "form-control", @type = "number", min = "0", max = "100", validation = "number" })
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(model => model.AssessorID)
@@ -132,8 +327,8 @@
                         @Html.CheckBoxFor(model => model.IsOline)
                     </div>
                     <div style="width: 100%; text-align: center;">
-                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
-                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-dismiss="modal">Cancel</button>
                     </div>
                 }
             </div>
@@ -141,7 +336,7 @@
     </div>
 </div>
 
-<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+@*<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>*@
 <!--<script type="text/javascript" src="~/js/jquery-validation-engine.js"></script>-->
 <script type="text/javascript">
 
@@ -334,7 +529,7 @@
                     is_valid = false;
             }
 
-             for (var pIndex = 0; pIndex < obj.selectList.length; pIndex++) {
+            for (var pIndex = 0; pIndex < obj.selectList.length; pIndex++) {
                 if (!obj.selectList[pIndex].validate()) {
                     is_valid = false;
                 }
@@ -360,7 +555,19 @@
     };
 
     $(document).ready(function () {
-        var form = $(document.getElementsByTagName("form"));
+
+        $("#tippConnectUnitActivityTable").DataTable({
+            dom: 'Bfrtip',
+            buttons: [{
+                text: "Add Activity"
+            }]
+        });
+
+        $("button.dt-button").attr("data-toggle", "modal");
+        $("button.dt-button").attr("data-target", "#CreatePrograomUnitActivityForm");
+        $("button.dt-button").addClass("tipp-custom-button");
+       
+        var form = $(document.getElementsById("CreateActivityForm"));
         form.submit(function (e) {
             var validate_form = new Form(form);
 

@@ -18,6 +18,16 @@ namespace BusinessSchoolMLS.Controllers
 {
     public class AdministrationController : Controller
     {
+        private readonly ApplicationBusinessComponent applicationBusinessComponent;
+        private readonly LoginBusinessComponent loginBusinessComponent;
+        private readonly  NotificationBusinessComponent notificationBusiness;
+        public AdministrationController()
+        {
+            applicationBusinessComponent = new ApplicationBusinessComponent();
+            loginBusinessComponent = new LoginBusinessComponent();
+            notificationBusiness  = new NotificationBusinessComponent();
+        }
+
         // GET: /<controller>/
         public IActionResult Index()
         {
@@ -107,9 +117,27 @@ namespace BusinessSchoolMLS.Controllers
             return RedirectToAction("FinancialAccount", "Administration", new { mid = mguid, aid =txtAcademicYear, sid = student_guid });
         }
 
+        public string GetPushWebNotificationByMemberId(string mid)
+        {
+            try
+            {
+                LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+                NotificationBusinessComponent notification = new NotificationBusinessComponent();
+                int MemberId = loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+                PushWebNotification push = notification.GetWebPushNotificationByMemberId(MemberId);
+
+                return JsonConvert.SerializeObject(push);
+            }
+            catch(Exception)
+            {
+                return JsonConvert.SerializeObject(new PushWebNotification { PushType = "", PushText = "", PushTitle = "" });
+            }
+        }
+
         public IActionResult SaveStaffMember([FromForm]ApplicationMemberModel applicationMemberModel)
         {
             string mguid = string.Empty;
+            int mmeber_id = 0;
             try
             {
                 if (Session.AppSession.ContainsKey("MemberID"))
@@ -117,20 +145,43 @@ namespace BusinessSchoolMLS.Controllers
                     mguid = Session.AppSession["MemberID"].ToString();
                     Session.AppSession.Remove("MemberID");
                 }
-                ApplicationBusinessComponent applicationBusinessComponent = new ApplicationBusinessComponent();
-                NotificationBusinessComponent notificationBusiness = new NotificationBusinessComponent();
+                mmeber_id = loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
                 var new_staff_member = applicationBusinessComponent.SaveApplication(applicationMemberModel);
                 notificationBusiness.InsertSystemNotification(
                                                                  (int)ApplicationProgressStatus.NEW_STAFF_MEMBER,
                                                                  new_staff_member.MemberID,
                                                                  Session.AppSession["ApplicationId"].ToString()
                                                              );
+                notificationBusiness.InsertWebPushNotification("info", "Create Tipp Connect User", "Tipp Connect User has been created!", mmeber_id);
             }
             catch(Exception exception)
             {
                 LogMessageBusinessComponent.InsertLogMessage(mguid, MessageNode.SYS_SAVE_STAFF_MEMBER_ERROR, exception.ToString());
+                notificationBusiness.InsertWebPushNotification("error", "Tipp Connect User", "Tipp Connect User has not been created!", mmeber_id);
             }
             return RedirectToAction("StaffMembers", "Administration", new { mid = mguid });
+        }
+
+
+        public string DeleteTippConnectUser(string IDNo)
+        {
+            string mguid = string.Empty;
+            int member_id = 0;
+            try
+            {
+                if (Session.AppSession.ContainsKey("MemberID"))
+                {
+                    mguid = Session.AppSession["MemberID"].ToString();
+                }
+                member_id = loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
+                applicationBusinessComponent.RemoveUserFromTippConnect(IDNo, member_id);
+                notificationBusiness.InsertWebPushNotification("info", "Delete Tipp Connect User", "Tipp Connect User has been deleted!", member_id);
+            }
+            catch (Exception exception)
+            {
+                notificationBusiness.InsertWebPushNotification("error", "Tipp Connect User", "Tipp Connect User failed to be removed!", member_id);
+            }
+            return JsonConvert.SerializeObject(new { StatusCode = 200, Message = "User is removed from the system." });
         }
 
         public IActionResult DocumentVerify(string mid, string uid)
@@ -154,45 +205,33 @@ namespace BusinessSchoolMLS.Controllers
         {
             try
             {
-                if(!string.IsNullOrEmpty(mid))
+                ApplicationMemberModel applicationMemberModel = new ApplicationMemberModel();
+                if (!string.IsNullOrEmpty(mid))
                 {
                     if (Session.AppSession.ContainsKey("MemberID"))
                     {
                         Session.AppSession.Remove("MemberID");
                     }
                     ViewBag.MemGuid = mid;
-                    Session.AppSession.Set("MemberID", mid);  
+                    Session.AppSession.Set("MemberID", mid);
+                    
+                    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+                    AdministratorBusinessComponent administratorBusinessComponent = new AdministratorBusinessComponent();
+                    var lst_all_gender = applicationBusinessComponent.GetAllGender().Select(sex => new SelectListItem { Value = sex.GenderID.ToString(), Text = sex.GenderName });
+                    var lst_all_faculties = facultyBusinessComponent.GetAllBusinessFaculty(Session.AppSession["ClientId"].ToString()).Select(fac => new SelectListItem { Value = fac.FacultyID.ToString(), Text = fac.FacultyName });
+                    var lst_all_roles = administratorBusinessComponent.GetStaffRoleModels().Select(role => new SelectListItem { Value = role.RoleID.ToString(), Text = role.RoleName });
+                    applicationMemberModel.Genders = new SelectList(lst_all_gender, "Value", "Text");
+                    applicationMemberModel.SchoolFaculties = new SelectList(lst_all_faculties, "Value", "Text");
+                    applicationMemberModel.StaffRoles = new SelectList(lst_all_roles, "Value", "Text");
                 }
+                return View(applicationMemberModel);
             }
             catch(Exception exception)
             {
-
+                LogMessageBusinessComponent.InsertLogMessage(mid, MessageNode.SYS_SAVE_STAFF_MEMBER_ERROR, exception.ToString());
             }
-            return View();
+            return RedirectToAction("Login", "Login");
         }
-
-        [HttpPost]
-        public string CancelEditMember()
-        {
-            string MemberID = string.Empty;
-            try
-            {
-                if (Session.AppSession.ContainsKey("MemberID"))
-                {
-                    MemberID = Session.AppSession["MemberID"].ToString();
-                    if (Session.AppSession.ContainsKey(string.Format("IDNo_{0}", MemberID)))
-                    {
-                        Session.AppSession.Remove(string.Format("IDNo_{0}", MemberID));
-                    }
-                }
-            }
-            catch(Exception exception)
-            {
-
-            }
-            return MemberID;
-        }
-
         public IActionResult StaffMembers(string mid)
         {
             try
@@ -210,25 +249,30 @@ namespace BusinessSchoolMLS.Controllers
             {
 
             }
-            return View();
+            return RedirectToAction("EditStaffMember", "Administration", new { mid = mid });
         }
 
         public IActionResult UpdateMemberDetails([FromForm]ApplicationMemberModel application)
         {
             string MemberID = string.Empty;
+            int member_id = 0;
+            LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+            ApplicationBusinessComponent businessComponent = new ApplicationBusinessComponent();
+            NotificationBusinessComponent notificationBusinessComponent = new NotificationBusinessComponent();
             try
             {
-                ApplicationBusinessComponent businessComponent = new ApplicationBusinessComponent();
-                businessComponent.UpdateStaffMemberByIDNo(application.IDNo, application.FirstName, application.LastName, application.CellNo, application.EmailAddress, application.RoleID);
                 if (Session.AppSession.ContainsKey("MemberID"))
                 {
                     MemberID = Session.AppSession["MemberID"].ToString();
                     Session.AppSession.Remove("MemberID");
                 }
+                member_id = loginBusinessComponent.GetMemberIDByMemberGuid(MemberID);
+                businessComponent.UpdateStaffMemberByIDNo(application.IDNo, application.FirstName, application.LastName, application.CellNo, application.EmailAddress, application.RoleID, application.GenderID);
+                notificationBusinessComponent.InsertWebPushNotification("info", "Update Tipp Connect User", "Tipp Connect User has been updated!", member_id);
             }
             catch(Exception exception)
             {
-
+                notificationBusinessComponent.InsertWebPushNotification("error", "Update Tipp Connect User", "Tipp Connect User update has failed!", member_id);
             }
             return RedirectToAction("StaffMembers", "Administration", new { mid = MemberID });
         }

@@ -90,7 +90,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
             }
         }
 
-        public bool UpdateStaffMemberByIDNo(string IDNo, string FirstName, string LastName, string CellNo, string EmailAddress, int RoleID)
+        public bool UpdateStaffMemberByIDNo(string IDNo, string FirstName, string LastName, string CellNo, string EmailAddress, int RoleID, int GenderID)
         {
             try
             {
@@ -104,6 +104,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 model.ApplicationParameter.Set("CellNo", CellNo);
                 model.ApplicationParameter.Set("EmailAddress", EmailAddress);
                 model.ApplicationParameter.Set("RoleID", RoleID);
+                model.ApplicationParameter.Set("GenderID", GenderID);
                 int Count = (int)CommonDataAccess.Process(model);
 
                 return Count > 0;
@@ -352,6 +353,26 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 return (int)CommonDataAccess.Process(model);
             }
             catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        public bool RemoveUserFromTippConnect(string IDNo, int MemberID)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ReturnType = DataReturnType.NonQuery;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter = new ApplicationSession();
+                model.ApplicationParameter.Set("IDNo", IDNo);
+                model.ApplicationParameter.Set("MemberID", MemberID);
+                int Count = (int)CommonDataAccess.Process(model);
+
+                return Count > 0;
+            }
+            catch(Exception exception)
             {
                 throw exception;
             }

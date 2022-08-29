@@ -141,6 +141,47 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
             }
         }
 
+        public bool UpdateModuleActivity(
+                                            int ModuleActivityID, 
+                                            int ModuleID, 
+                                            int ActivityID, 
+                                            DateTime ActivityDate, 
+                                            string ActivityTime, 
+                                            int ActivityDuration, 
+                                            int ActivityPassMark, 
+                                            int ActivityTotalMark, 
+                                            string MemberID, 
+                                            int AssessorID
+                                      )
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ReturnType = DataReturnType.NonQuery;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter = new ApplicationSession();
+                model.ApplicationParameter.Set("ModuleActivityID", ModuleActivityID);
+                model.ApplicationParameter.Set("ModuleID", ModuleID);
+                model.ApplicationParameter.Set("ActivityID", ActivityID);
+                model.ApplicationParameter.Set("ActivityDate", ActivityDate);
+                model.ApplicationParameter.Set("ActivityTime", ActivityTime);
+                model.ApplicationParameter.Set("ActivityDuration", ActivityDuration);
+                model.ApplicationParameter.Set("ActivityPassMark", ActivityPassMark);
+                model.ApplicationParameter.Set("ActivityTotalMark", ActivityTotalMark);
+                model.ApplicationParameter.Set("MemberID", MemberID);
+                model.ApplicationParameter.Set("AssessorID", AssessorID);
+
+                int Count = (int)CommonDataAccess.Process(model);
+
+                return Count > 1;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+
         public bool SaveModuleActivityUpload(ModuleActivityUploadModel moduleActivityUploadModel)
         {
             try

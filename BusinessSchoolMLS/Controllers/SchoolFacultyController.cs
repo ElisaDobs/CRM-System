@@ -16,6 +16,15 @@ namespace BusinessSchoolMLS.Controllers
 {
     public class SchoolFacultyController : Controller
     {
+        private readonly FacultyBusinessComponent _facultyBusinessComponent;
+        private readonly LoginBusinessComponent _loginBusinessComponent;
+        private readonly NotificationBusinessComponent _notificationBusinessComponent;
+        public SchoolFacultyController()
+        {
+            _facultyBusinessComponent = new FacultyBusinessComponent();
+            _loginBusinessComponent = new LoginBusinessComponent();
+            _notificationBusinessComponent = new NotificationBusinessComponent();
+        }
         // GET: /<controller>/
         public IActionResult Index()
         {
@@ -38,56 +47,74 @@ namespace BusinessSchoolMLS.Controllers
 
         public IActionResult FacultyQualification(QualificationModel qualificationModel)
         {
-            if (!string.IsNullOrEmpty(HttpContext.Request.Query["mid"]))
+            try
             {
-                ViewBag.MemGuid = HttpContext.Request.Query["mid"].ToString();
-                ViewBag.FacultyID = Convert.ToInt32(HttpContext.Request.Query["fid"].ToString());
-                FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
-                var lst_all_nqlevel = facultyBusinessComponent.GetAllNQLevel().Select(level => new SelectListItem { Value = level.NQLevelID.ToString(), Text = level.NQLevelName });
-                var lst_all_qual_types = facultyBusinessComponent.GetAllQualificationTypes()
-                                         ?.Select(type => new SelectListItem { Value = type.QualTypeID.ToString(), Text = type.QualTypeName });
-                qualificationModel.QualificationNQLevel = new SelectList(lst_all_nqlevel, "Value", "Text");
-                qualificationModel.QualificationTypes = new SelectList(lst_all_qual_types, "Value", "Text");
-                return View(qualificationModel);
+                if (!string.IsNullOrEmpty(HttpContext.Request.Query["mid"]))
+                {
+                    Session.AppSession.Add("MemberID", HttpContext.Request.Query["mid"]);
+                    ViewBag.MemGuid = HttpContext.Request.Query["mid"].ToString();
+                    ViewBag.FacultyID = Convert.ToInt32(HttpContext.Request.Query["fid"].ToString());
+                    var lst_all_nqlevel = _facultyBusinessComponent.GetAllNQLevel().Select(level => new SelectListItem { Value = level.NQLevelID.ToString(), Text = level.NQLevelName });
+                    var lst_all_qual_types = _facultyBusinessComponent.GetAllQualificationTypes()
+                                             ?.Select(type => new SelectListItem { Value = type.QualTypeID.ToString(), Text = type.QualTypeName });
+                    qualificationModel.QualificationNQLevel = new SelectList(lst_all_nqlevel, "Value", "Text");
+                    qualificationModel.QualificationTypes = new SelectList(lst_all_qual_types, "Value", "Text");
+                }
             }
-            else
+            catch(Exception)
             {
-                return RedirectToAction("Login", "Login");
-            }
 
+            }
+            return View(qualificationModel);
         }
 
         public IActionResult AddQualification([FromForm]QualificationModel qualificationModel)
         {
-            if (!string.IsNullOrEmpty(qualificationModel.MemberID))
+            string mguid = string.Empty;
+            int member_id = 0,
+                fac_id = 0;
+            try
             {
-                string mguid = qualificationModel.MemberID;
-                int fac_id = qualificationModel.FacultyID;
-                FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
-                facultyBusinessComponent.SaveFacultyQualification(qualificationModel);
-                return RedirectToAction("FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = fac_id });
+                if (Session.AppSession.ContainsKey("MemberID"))
+                {
+                    mguid = Session.AppSession["MemberID"].ToString();
+                    Session.AppSession.Remove("MemberID");
+                }
+                 fac_id = qualificationModel.FacultyID;
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
+                _facultyBusinessComponent.SaveFacultyQualification(qualificationModel);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Connect Program", "Tipp Connect Program has been successfully created!", member_id);
+
             }
-            else
+            catch(Exception)
             {
-                return RedirectToAction("Login", "Login");
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Connect Program", "Tipp Connect Program has unsuccessfully created!", member_id);
             }
+            return RedirectToAction("FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = fac_id });
         }
 
         public IActionResult EditProgram([FromForm]QualificationModel qualificationModel)
         {
-            if (!string.IsNullOrEmpty(qualificationModel.MemberID))
+            string mguid = string.Empty;
+            int fac_id = 0,
+                member_id = 0;
+            try
             {
-
-                FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
-                string mguid = qualificationModel.MemberID;
-                int fac_id = qualificationModel.FacultyID;
-                facultyBusinessComponent.UpdateQualificationByQualificationID(qualificationModel);
-                return RedirectToAction("FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = fac_id });
+                if (Session.AppSession.ContainsKey("MemberID"))
+                {
+                    mguid = Session.AppSession["MemberID"].ToString();
+                    Session.AppSession.Remove("MemberID");
+                }
+                fac_id = qualificationModel.FacultyID;
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
+                _facultyBusinessComponent.UpdateQualificationByQualificationID(qualificationModel);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Connect Program", "Tipp Connect Program has unsuccessfully updated.", member_id);
             }
-            else
+            catch(Exception)
             {
-                return RedirectToAction("Login", "Login");
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Connect Program", "Tipp Connect Program has been unsuccessfully created!", member_id);
             }
+            return RedirectToAction("FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = fac_id });
         }
 
         public IActionResult FacultyModule(ModuleModel moduleModel)

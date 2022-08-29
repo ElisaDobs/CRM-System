@@ -166,7 +166,9 @@ namespace MRTD.Core.Common
 
         SYS_REQUIRED_DOCUMENT_ERROR = 41,
         SYS_UPLOAD_PAYMENT_ERROR = 42,
-        SIGNED_LETTER_CODE_ERROR = 43
+        SIGNED_LETTER_CODE_ERROR = 43,
+
+        SYS_MODULE_ACTIVITY_UPDATE_ERROR = 44
     }
     public enum DataReturnType
     {

@@ -47,17 +47,16 @@
         width: 100%; 
         text-align: left;
     }
-    .tipp-btn-default
-    {
-        width: 140px; 
-        color: #6d2829;
-    }
-    .tipp-redirect-link
-    {
-        color: #377091;
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff;
+        background-color: #377091;
     }
     a
     {
+        color: #ffffff;
+    }
+    .tipp-redirect-link {
         color: #377091;
     }
 </style>
@@ -86,13 +85,13 @@
                 @Html.PasswordFor(model => model.Password, new { @class = "form-control tipp-input-field", validation = "required" })
             </div>
             <div style="text-align: center; width: 100%;">
-                <input type="submit" value="Log In" class="btn btn-default tipp-btn-default" />
-                <button type="button" class="btn btn-default tipp-btn-default">
+                <input type="submit" value="Log In" class="btn btn-primary tipp-custom-button" />
+                <button type="button" class="btn btn-primary tipp-custom-button">
                     @Html.ActionLink("Reset Password", "ChangePassword", "Login")
                 </button>
             </div>
             <div>
-                @Html.ActionLink("Forgot your password?", "ForgotPassword", "Login")
+                @Html.ActionLink("Forgot your password?", "ForgotPassword", "Login", new { }, new { @class= "tipp-redirect-link " })
             </div>
         }
     </div>
