@@ -268,8 +268,8 @@
                         </div>
                     </div>
                     <div class="modal-footer" style="width: 100%; text-align: center;">
-                        <button type="submit" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-toggle="modal">Save</button>
-                        <button type="button" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-primary tipp-custom-button" data-dismiss="modal">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -282,7 +282,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title tipp-header">Create Unit Activity</h4>
+                <h4 class="modal-title tipp-header">Create Activity</h4>
             </div>
             <div class="modal-body">
                 @using (Html.BeginForm("AddModuleActivity", "ModuleActivity", FormMethod.Post, new { id="CreateActivityForm" }))
@@ -327,8 +327,8 @@
                         @Html.CheckBoxFor(model => model.IsOline)
                     </div>
                     <div style="width: 100%; text-align: center;">
-                        <button type="submit" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-toggle="modal">Save</button>
-                        <button type="button" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-primary tipp-custom-button" data-dismiss="modal">Cancel</button>
                     </div>
                 }
             </div>

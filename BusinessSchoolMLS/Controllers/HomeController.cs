@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using MRTD.Core.Models;
+using MRTD.Core.Common;
 
 namespace BusinessSchoolMLS.Controllers
 {
@@ -15,7 +16,7 @@ namespace BusinessSchoolMLS.Controllers
         {
             if (!string.IsNullOrEmpty(mid))
             {
-                ViewBag.MemGuid = mid;
+                Session.AppSession.Set("MemberID", mid);
                 ViewBag.AcademicYear = DateTime.Now.Year;
                 return View();
             }

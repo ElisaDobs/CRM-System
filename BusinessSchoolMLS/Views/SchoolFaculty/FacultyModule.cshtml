@@ -88,6 +88,7 @@
         position: absolute;
         width: 75%;
     }
+
     .tipp-custom-button {
         width: 140px;
         color: #ffffff !important;
@@ -151,7 +152,7 @@
                             </button>
                         </td>
                         <td>
-                            @Html.ActionLink("Activity", "activities", "ModuleActivity", new { mid = mguid, modid = qual_module.ModuleID, qid = qual_id, fid = fac_id }, new { @class= "tipp-redirect-link" })
+                            @Html.ActionLink("Activity", "activities", "ModuleActivity", new { mid = mguid, modid = qual_module.ModuleID, qid = qual_id, fid = fac_id }, new { @class = "tipp-redirect-link" })
                         </td>
                     </tr>
                 }
@@ -169,9 +170,10 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title tipp-header">Edit Unit</h4>
                 </div>
-                <div class="modal-body">
-                    @using (Html.BeginForm("EditModule", "SchoolFaculty", FormMethod.Post))
-                    {
+                @using (Html.BeginForm("EditModule", "SchoolFaculty", FormMethod.Post))
+                {
+                    <div class="modal-body">
+
                         <input type="hidden" name="MemberID" value="@mguid" />
                         <input type="hidden" name="QualificationID" value="@qual_id" />
                         <input type="hidden" name="FacultyID" value="@fac_id" />
@@ -224,16 +226,15 @@
                                     {
                                         <option value="@level.Value.ToString()">@level.Text</option>
                                     }
-
                                 }
                             </select>
                         </div>
                         <div style="width: 100%; text-align: center;">
-                            <button type="submit" class="btn btn-primary tipp-custom-button" style="width: 100px;" data-toggle="modal">Save</button>
-                            <button type="button" class="btn btn-primary tipp-custom-button"" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>
+                            <button type="button" class="btn btn-primary tipp-custom-button" data-dismiss="modal">Cancel</button>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -244,8 +245,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Create Unit</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title tipp-header">Create Unit</h4>
             </div>
             <div class="modal-body">
                 @using (Html.BeginForm("AddModule", string.Format("SchoolFaculty"), FormMethod.Post))

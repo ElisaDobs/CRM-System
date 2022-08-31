@@ -11,5 +11,7 @@ namespace MRTD.Core.Models
         public string ChatName { get; set; }
         public bool IsChatOpen {get; set; }
 		public string ModuleName { get; set; }
+        public string FullName { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

@@ -10,9 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="MRTD.Core">
-      <HintPath>..\MRTD.Core\bin\Debug\netstandard2.0\MRTD.Core.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\MRTD.Core\MRTD.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SQLScripts\" />
   </ItemGroup>
 
 </Project>

@@ -112,7 +112,7 @@ namespace MRTD.Core.Models
         public int QualificationID { get; set; }
 
         [Required]
-        [Display(Name = "Tippp Academy Qualification")]
+        [Display(Name = "Tipp Academy Qualification")]
         public int FacultyID { get; set; }
 
         [Display(Name = "Role")]

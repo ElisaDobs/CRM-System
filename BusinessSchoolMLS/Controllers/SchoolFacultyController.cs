@@ -45,15 +45,14 @@ namespace BusinessSchoolMLS.Controllers
             }
         }
 
-        public IActionResult FacultyQualification(QualificationModel qualificationModel)
+        public IActionResult FacultyQualification(string mid, string fid)
         {
+            QualificationModel qualificationModel = new QualificationModel();
             try
             {
-                if (!string.IsNullOrEmpty(HttpContext.Request.Query["mid"]))
+                if (!string.IsNullOrEmpty(mid) )
                 {
-                    Session.AppSession.Add("MemberID", HttpContext.Request.Query["mid"]);
-                    ViewBag.MemGuid = HttpContext.Request.Query["mid"].ToString();
-                    ViewBag.FacultyID = Convert.ToInt32(HttpContext.Request.Query["fid"].ToString());
+                    ViewBag.FacultyID = Convert.ToInt32(fid);
                     var lst_all_nqlevel = _facultyBusinessComponent.GetAllNQLevel().Select(level => new SelectListItem { Value = level.NQLevelID.ToString(), Text = level.NQLevelName });
                     var lst_all_qual_types = _facultyBusinessComponent.GetAllQualificationTypes()
                                              ?.Select(type => new SelectListItem { Value = type.QualTypeID.ToString(), Text = type.QualTypeName });
@@ -78,7 +77,6 @@ namespace BusinessSchoolMLS.Controllers
                 if (Session.AppSession.ContainsKey("MemberID"))
                 {
                     mguid = Session.AppSession["MemberID"].ToString();
-                    Session.AppSession.Remove("MemberID");
                 }
                  fac_id = qualificationModel.FacultyID;
                 member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
@@ -103,7 +101,6 @@ namespace BusinessSchoolMLS.Controllers
                 if (Session.AppSession.ContainsKey("MemberID"))
                 {
                     mguid = Session.AppSession["MemberID"].ToString();
-                    Session.AppSession.Remove("MemberID");
                 }
                 fac_id = qualificationModel.FacultyID;
                 member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
@@ -165,17 +162,26 @@ namespace BusinessSchoolMLS.Controllers
 
         public IActionResult SaveUnitGroupMembers([FromForm]UnitGroupAttendanceModel unitGroupAttendanceModel)
         {
-            FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
-            string all_form_keys = HttpContext.Request.Form["MemberID"];
-            foreach (string MemID in all_form_keys.Split(','))
+            int member_id = 0;
+            try
             {
-                UnitGroupAttendanceModel unitGroup = new UnitGroupAttendanceModel()
+                string all_form_keys = HttpContext.Request.Form["MemberID"];
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(unitGroupAttendanceModel.UserID);
+                foreach (string MemID in all_form_keys.Split(','))
                 {
-                    GroupID = unitGroupAttendanceModel.GroupID,
-                    UserID = unitGroupAttendanceModel.UserID,
-                    MemberID = MemID
-                };
-                facultyBusinessComponent.InsertUnitGroupAttendance(unitGroup);
+                    UnitGroupAttendanceModel unitGroup = new UnitGroupAttendanceModel()
+                    {
+                        GroupID = unitGroupAttendanceModel.GroupID,
+                        UserID = unitGroupAttendanceModel.UserID,
+                        MemberID = MemID
+                    };
+                    _facultyBusinessComponent.InsertUnitGroupAttendance(unitGroup);
+                }
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Unit Group Student", "Group Student(s) are successfully added.", member_id);
+            }
+            catch(Exception exception)
+            {
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Unit Group Student", "Group Student(s) are unsuccssfully added.", member_id);
             }
             return RedirectToAction("GroupAttendants", "SchoolFaculty", new { mid = unitGroupAttendanceModel.UserID, gid = unitGroupAttendanceModel.GroupID });
         }
@@ -449,6 +455,24 @@ namespace BusinessSchoolMLS.Controllers
 
             }
             return graduation_list;
+        }
+
+        public IActionResult RemoveStudentFromGroup(string mid, int gid, string stdid)
+        {
+            int member_id = 0,
+                student_id = 0;
+            try
+            {
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+                student_id = _loginBusinessComponent.GetMemberIDByMemberGuid(stdid);
+                _facultyBusinessComponent.RemoveStudentFromUnitGroup(gid, student_id);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Unit Group", "Group student is successfully removed!", member_id);
+            }
+            catch(Exception exception)
+            {
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Unit Group", "Group student is unsuccessfully removed!", member_id);
+            }
+            return RedirectToAction("GroupAttendants", "SchoolFaculty", new { mid = mid, gid = gid });
         }
     }
 }

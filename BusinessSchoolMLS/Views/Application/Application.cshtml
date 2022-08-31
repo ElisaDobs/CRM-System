@@ -12,6 +12,8 @@
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/datatables.min.css" />
+        <link rel="stylesheet" href="~/css/buttons.dataTables.min.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -64,13 +66,13 @@
             color: #6d2829;
         }
 
-        .tipp-btn-container
-        {
-            width: 100%; 
-            left: 5%; 
-            position: relative; 
+        .tipp-btn-container {
+            width: 100%;
+            left: 5%;
+            position: relative;
             text-align: left;
         }
+
         .tipp-redirect-link {
             color: #377091;
         }
@@ -78,17 +80,40 @@
         a {
             color: #377091;
         }
-        .tipp-logo
-        {
+
+        .tipp-logo {
             padding-top: 0px;
-            top: 5px; 
+            top: 5px;
             position: absolute;
         }
-        .tipp-logo-botton-line
-        {
-            background-color: #377091; 
-            width: 100%; 
+
+        .tipp-logo-botton-line {
+            background-color: #377091;
+            width: 100%;
             height: 10px
+        }
+
+        .tipp-custom-button {
+            width: 140px;
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+
+        .tipp-custom-search-button {
+            width: 100px;
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+        .tipp-custom-modal-size
+        {
+            width: 70% !important;
+        }
+        .modal-dialog {
+            width: 850px;
+        }
+        thead > tr {
+            color: #ffffff !important;
+            background-color: #377091 !important;
         }
     </style>
 </head>
@@ -119,66 +144,66 @@
                     <div style="width: 100%;">
                         <div style="width: 100%; display: inline-block;">
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.FirstName, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.FirstName, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control", validation = "required" })
                             </div>
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.LastName, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.LastName, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.LastName, new { @class = "form-control", validation = "required" })
                             </div>
                         </div>
                         <div style="width: 100%; display: inline-block;">
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.TitleID, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.TitleID, new { @class = "tipp-label" })
                                 @Html.DropDownListFor(model => model.TitleID, Model.Titles, new { @class = "form-control", validation = "select" })
                             </div>
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.IDNo, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.IDNo, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.IDNo, new { @class = "form-control", validation = "required" })
                             </div>
                         </div>
                         <div style="width: 100%; display: inline-block;">
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.WorkTelNo, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.WorkTelNo, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.WorkTelNo, new { @class = "form-control", validation = "required" })
                             </div>
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.HomeTelNo, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.HomeTelNo, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.HomeTelNo, new { @class = "form-control", validation = "required" })
                             </div>
                         </div>
                         <div style="width: 100%; display: inline-block">
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.CellNo, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.CellNo, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.CellNo, new { @class = "form-control", @tel = "tel", validation = "required" })
                             </div>
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.EmailAddress, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.EmailAddress, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.EmailAddress, new { @class = "form-control", validation = "required" })
                             </div>
                             <div style="width: 100%; display: inline-block">
                                 <div class="form-group" style="width: 40%; display: inline-block;">
-                                    @Html.LabelFor(model => model.PhysicalAddress, new { @class="tipp-label"})
+                                    @Html.LabelFor(model => model.PhysicalAddress, new { @class = "tipp-label" })
                                     @Html.TextBoxFor(model => model.PhysicalAddress, new { @class = "form-control", validation = "required" })
                                 </div>
                                 <div class="form-group" style="width: 40%; display: inline-block;">
-                                    @Html.LabelFor(model => model.IsSameAddress, new { @class="tipp-label"})
-                                    @Html.CheckBoxFor(model => model.IsSameAddress)
+                                    @Html.LabelFor(model => model.IsSameAddress, new { @class = "tipp-label" })
+                                    <input type="checkbox" name="IsSameAddress" id="IsSameAddress" onclick="javascript:PhysicalPostalAddressSame()" />
                                 </div>
                             </div>
                             <div style="width: 100%; display: inline-block">
                                 <div class="form-group" style="width: 40%; display: inline-block;">
-                                    @Html.LabelFor(model => model.PostalAddress, new { @class="tipp-label"})
+                                    @Html.LabelFor(model => model.PostalAddress, new { @class = "tipp-label" })
                                     @Html.TextBoxFor(model => model.PostalAddress, new { @class = "form-control", validation = "required" })
                                 </div>
                                 <div class="form-group" style="width: 40%; display: inline-block;">
-                                    @Html.LabelFor(model => model.Password, new { @class="tipp-label"})
+                                    @Html.LabelFor(model => model.Password, new { @class = "tipp-label" })
                                     @Html.PasswordFor(model => model.Password, new { @class = "form-control", validation = "required" })
                                 </div>
                             </div>
                             <div style="width: 100%; display: inline-block">
                                 <div class="form-group" style="width: 40%; display: inline-block;">
-                                    @Html.LabelFor(model => model.ConfirmPassword, new { @class="tipp-label"})
+                                    @Html.LabelFor(model => model.ConfirmPassword, new { @class = "tipp-label" })
                                     @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control", validation = "required" })
                                 </div>
                             </div>
@@ -191,31 +216,31 @@
                     </div>
                     <div style="width: 100%; display: inline-block;">
                         <div class="form-group" style="width: 40%; display: inline-block;">
-                            @Html.LabelFor(model => model.NationID, new { @class="tipp-label"})
+                            @Html.LabelFor(model => model.NationID, new { @class = "tipp-label" })
                             @Html.DropDownListFor(model => model.NationID, Model.Nations, new { @class = "form-control", validation = "select" })
                         </div>
                         <div class="form-group" style="width: 40%; display: inline-block;">
-                            @Html.LabelFor(model => model.GenderID, new { @class="tipp-label"})
+                            @Html.LabelFor(model => model.GenderID, new { @class = "tipp-label" })
                             @Html.DropDownListFor(model => model.GenderID, Model.Genders, new { @class = "form-control", validation = "select" })
                         </div>
                     </div>
                     <div style="width: 100%; display: inline-block;">
                         <div style="width: 40%; display: inline-block;">
-                            @Html.LabelFor(model => model.RaceID, new { @class="tipp-label"})
+                            @Html.LabelFor(model => model.RaceID, new { @class = "tipp-label" })
                             @Html.DropDownListFor(model => model.RaceID, Model.Races, new { @class = "form-control", validation = "select" })
                         </div>
                         <div style="width: 40%; display: inline-block;">
-                            @Html.LabelFor(model => model.LanguageID, new { @class="tipp-label"})
+                            @Html.LabelFor(model => model.LanguageID, new { @class = "tipp-label" })
                             @Html.DropDownListFor(model => model.LanguageID, Model.Languages, new { @class = "form-control", validation = "select" })
                         </div>
                     </div>
                     <div style="width: 100%; display: inline-block;">
                         <div class="form-group" style="width: 40%; display: inline-block;">
-                            @Html.LabelFor(model => model.Disability, new { @class="tipp-label"})
+                            @Html.LabelFor(model => model.Disability, new { @class = "tipp-label" })
                             @Html.TextBoxFor(model => model.Disability, new { @class = "form-control", validation = "required" })
                         </div>
                         <div class="form-group" style="width: 40%; display: inline-block;">
-                            @Html.LabelFor(model => model.SpecialLearningRequirement, new { @class="tipp-label"})
+                            @Html.LabelFor(model => model.SpecialLearningRequirement, new { @class = "tipp-label" })
                             @Html.TextBoxFor(model => model.SpecialLearningRequirement, new { @class = "form-control", validation = "required" })
                         </div>
                     </div>
@@ -227,46 +252,78 @@
                     <div style="width: 100%; display: inline-block;">
                         <div style="width: 100%; display: inline-block;">
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.Employer, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.Employer, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.Employer, new { @class = "form-control", validation = "required" })
                             </div>
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.Department, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.Department, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.Department, new { @class = "form-control", validation = "required" })
                             </div>
                         </div>
                         <div style="width: 100%; display: inline-block;">
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.Occupation, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.Occupation, new { @class = "tipp-label" })
                                 @Html.TextBoxFor(model => model.Occupation, new { @class = "form-control", validation = "required" })
                             </div>
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.HighQualID, new { @class="tipp-label"})
+                                @Html.LabelFor(model => model.HighQualID, new { @class = "tipp-label" })
                                 @Html.DropDownListFor(model => model.HighQualID, Model.HighestQualifications, new { @class = "form-control", validation = "select" })
                             </div>
                         </div>
                         <div style="width: 100%; display: inline-block;">
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.FacultyID, new { @class="tipp-label"})
-                                @Html.DropDownListFor(model => model.FacultyID, Model.SchoolFaculties, new { @class = "form-control", validation = "select" })
+                                @Html.LabelFor(model => model.QualificationID, new { @class = "tipp-label" })
+                                <input type="hidden" name="QualificationID" id="QualificationID" />
+                                <div style="width: 100%; display: inline-block;">
+                                    <input type="text" name="_QualificationID" id="_QualificationID" class="form-control" style="width: 65%; display: inline-block;" />
+                                    <button type="button" class="btn btn-primary tipp-custom-search-button" style="width: 30%; display: inline-block;" data-toggle="modal" data-target="#TippProgramForm">
+                                        <span class="glyphicon glyphicon-search"></span> Search
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-group" style="width: 40%; display: inline-block;">
-                                @Html.LabelFor(model => model.QualificationID, new { @class="tipp-label"})
-                                <select id="QualificationID" name="QualificationID" class="form-control" validation="select">
-                                    <option value="0"></option>
-                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="form-group tipp-btn-container">
-                <input type="submit" value="Submit" class="btn btn-default tipp-btn-default" />
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-primary tipp-custom-button" />
             </div>
         }
     </div>
+
+    <div id="TippProgramForm" class="modal fade tipp-custom-modal-size">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title tipp-header">Tipp Academy Programs</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.Partial("_ProgramsView");
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/jquery-3.4.1.min.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/dataTables.buttons.min.js"></script>
     <script type="text/javascript">
+
+        function PhysicalPostalAddressSame() {
+            if ($("#PostalAddress").val() !== "") {
+                $("#IsSameAddress").removeAttr("value");
+                $("#PostalAddress").val("");
+            }
+            else {
+                $("#PostalAddress").val($("#PhysicalAddress").val());
+            }
+        }
+
         $(document).ready(function () {
             /*
      Author Name :     Tsaleni Dobson Maswanganye
@@ -490,32 +547,15 @@
                 }
             });
 
-            $("#IsSameAddress").change(function () {
-                if (this.checked) {
-                    $("#PostalAddress").val($("#PhysicalAddress").val());
-                }
-                else {
+            function PhysicalPostalAddressSame() {
+                alert($("#IsSameAddress").val());
+                if ($("#PostalAddress").val() !== "") {
                     $("#PostalAddress").val("");
                 }
-            });
-
-            $(document.getElementById("FacultyID")).bind("change", function () {
-                var selectedIndex = "";
-                var counter = 0;
-                $("#FacultyID option:selected").each(function (index) {
-                    $.getJSON(@redirect + "/Application/GetQualificationByFaculty?FacultyID=" + $(this).val(), function (data) {
-                        if (counter < data.length) {
-                            for (var opt in data) {
-                                counter++;
-                                var option = $(document.createElement("option"));
-                                option.val(data[opt].QualificationID);
-                                option.text(data[opt].QualificationName);
-                                $("#QualificationID").append(option);
-                            }
-                        }
-                    });
-                });
-            });
+                else {
+                    $("#PostalAddress").val($("#PhysicalAddress").val());
+                }
+            }
         });
     </script>
 </body>

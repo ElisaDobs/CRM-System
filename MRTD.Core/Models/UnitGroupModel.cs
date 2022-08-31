@@ -12,13 +12,13 @@ namespace MRTD.Core.Models
         [Display(Name = "Group Name")]
         public string GroupName { get; set; }
 
-        [Display(Name = "Module")]
+        [Display(Name = "Unit Name")]
         public int ModuleID { get; set; }
 
-        [Display(Name = "Date")]
+        [Display(Name = "Attendance Date")]
         public DateTime AttDate { get; set; }
 
-        [Display(Name = "Time")]
+        [Display(Name = "Attendance Time")]
         public DateTime AttTime { get; set; }
 
         public string MemberID { get; set; }

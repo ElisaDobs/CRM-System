@@ -1,11 +1,15 @@
-﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+﻿@using MRTD.Core.Common;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
 
 @{
     ViewData["Title"] = "Home";
-    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
-    string mem_guid = ViewBag.MemGuid;
-
-    bool IsStudent = loginBusinessComponent.IsStudentCheckByMemberGuid(mem_guid);
+    bool IsStudent = false;
+    if (Session.AppSession.ContainsKey("MemberID"))
+    {
+        LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+        IsStudent = loginBusinessComponent.IsStudentCheckByMemberGuid(Session.AppSession["MemberID"].ToString());
+    }
 }
 @if (!IsStudent)
 {

@@ -1,0 +1,44 @@
+﻿@model MRTD.Core.Models.MemberViewModel;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    ModuleActivityBusinessComponent component = new ModuleActivityBusinessComponent();
+    var lst_member_chats = component.GetAllMemberPerChatID(Model.ChatID);
+}
+<input type="hidden" name="MemberID" id="MemberID" value="@Model.MUID" />
+<input type="hidden" name="ChatID" id="ChatID" value="@Model.ChatID" />
+<div class="table-responsive">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Module Name</th>
+                <th>Chat Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var active_chat in lst_member_chats)
+            {
+                <tr>
+                    <td>
+                        @active_chat.FullName
+                    </td>
+                    <td>
+                        @active_chat.ModuleName
+                    </td>
+                    <td>
+                        @active_chat.ChatName
+                    </td>
+                    <td>
+                        <a class="btn btn-primary btn-sm tipp-custom-grid-button" href="@Url.Action("RemoveFromChat", "ModuleActivity", new { mid = active_chat.MemberID, fid = Model.ChatID })">
+                            <span class="glyphicon glyphicon-remove"> Delete</span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

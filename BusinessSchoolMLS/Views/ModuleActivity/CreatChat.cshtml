@@ -7,71 +7,206 @@
     ModuleActivityBusinessComponent component = new ModuleActivityBusinessComponent();
     var lst_active_chat = component.GetAllStudyUnitActive(Session.AppSession["ClientId"].ToString());
 }
-
-<div>
-    &nbsp;
-</div>
-<div>
-    <h4 style="color: #6d2829;">Create/Manage Chat</h4>
-</div>
-
-<div>
-    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-group">Create Chat</button>
-</div>
-<div>
-    @using (Html.BeginForm("CloseChat", "ModuleActivity", FormMethod.Post))
-    {
-        <input type="hidden" name="MemberID" id="MemberID" value="@ViewBag.MemGuid" />
-        <div class="table-responsive">
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Unit Name</th>
-                        <th>Chat Name</th>
-                        <th>Close Chat</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var active_chat in lst_active_chat)
-                    {
-                        <tr>
-                            <td>
-                                @active_chat.ModuleName
-                            </td>
-                            <td>
-                                @active_chat.ChatName
-                            </td>
-                            <td>
-                                <input type="checkbox" name="CloseChat" value="@active_chat.ChatID" />
-                            </td>
-                            <td>
-                                @Html.ActionLink("Manage Chat", "ManageChat", "ModuleActivity", new { mid = ViewBag.MemGuid, cid = active_chat.ChatID })
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-        </div>
-        <div style="width: 100%; text-align: center;">
-            <button type="submit" class="btn btn-default" style="width: 250px;" data-toggle="modal">Close Chat(s)</button>
-        </div>
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
     }
+
+    .tipp-label {
+        color: #377091;
+    }
+
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+        width: 75%;
+    }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091 !important;
+    }
+</style>
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">Create/Manage Chat</h4>
+    </div>
+    <div>
+        <table id="tippUnitManageChat" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Unit Name</th>
+                    <th>Chat Name</th>
+                    <th>Created By</th>
+                    <th>Date Created</th>
+                    <th>Chat Status</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var active_chat in lst_active_chat)
+                {
+                    <tr>
+                        <td>
+                            @active_chat.ModuleName
+                        </td>
+                        <td>
+                            @active_chat.ChatName
+                        </td>
+                        <td>
+                            @active_chat.FullName
+                        </td>
+                        <td>
+                            @active_chat.DateCreated.ToString("yyyy MM dd HH:mm:ss")
+                        </td>
+                        <td align="center">
+                            @if (@active_chat.IsChatOpen)
+                            {
+                                <span class="glyphicon glyphicon-open"></span><span> Open</span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-eye-close"></span><span> Closed</span>
+                            }
+                        </td>
+                        <td align="center">
+                            @if (@active_chat.IsChatOpen)
+                            {
+                                <a class="btn btn-primary btn-sm tipp-custom-grid-button" href="@Url.Action("CloseChat", "ModuleActivity", new { mid = Session.AppSession["MemberID"].ToString(), chatid = active_chat.ChatID })">
+                                    <span class="glyphicon glyphicon-eye-close"></span> Close
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-primary btn-sm tipp-custom-grid-button" href="@Url.Action("CloseChat", "ModuleActivity", new { mid = Session.AppSession["MemberID"].ToString(), chatid = active_chat.ChatID })">
+                                    <span class="glyphicon glyphicon-eye-close"></span> Open
+                                </a>
+                            }
+                        </td>
+                        <td align="center">
+                            <button type="button" class="btn btn-primary btn-sm tipp-custom-button" data-toggle="modal" data-target="#@active_chat.ChatID">
+                                <span class="glyphicon glyphicon-list"></span> Manage Chats
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div id="create-group" class="modal fade">
+@foreach (var active_chat in lst_active_chat)
+{
+    <div id="@active_chat.ChatID" class="modal fade">
+        <div class="modal-dialog" style="width: 800px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title tipp-header">Manage Chat - @active_chat.ChatName</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.Partial("_ManageUnitChat", new MemberViewModel { MUID = Session.AppSession["MemberID"].ToString(), ChatID = active_chat.ChatID });
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div id="TippCreateChatForm" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Create/Edit Unit Chat</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title tipp-header">Create Unit Chat</h4>
             </div>
             <div class="modal-body">
                 @using (Html.BeginForm("SaveChat", "ModuleActivity", FormMethod.Post))
                 {
-                    <input type="hidden" name="mid" id="mid" value="@ViewBag.MemGuid" />
+                    <input type="hidden" name="mid" id="mid" value="@Session.AppSession["MemberID"].ToString()" />
                     <div class="form-group">
                         <label for="txtChatName">Chat Name</label>
                         <input type="text" name="txtChatName" id="txtChatName" class="form-control" />
@@ -84,8 +219,8 @@
                     <div class="form-group">
                     </div>
                     <div style="width: 100%; text-align: center;">
-                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
-                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-primary tipp-custom-button" data-dismiss="modal">Cancel</button>
                     </div>
                 }
             </div>
@@ -93,7 +228,7 @@
     </div>
 </div>
 
-<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+@*<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>*@
 
 <script type="text/javascript">
 
@@ -195,6 +330,19 @@
     }
 
     $(document).ready(function () {
+
+        $("#tippUnitManageChat").DataTable({
+            dom: 'Bfrtip',
+            buttons: [{
+                text: "Add Chat"
+            }]
+        });
+
+        $("button.dt-button").attr("data-toggle", "modal");
+        $("button.dt-button").attr("data-target", "#TippCreateChatForm");
+        $("button.dt-button").addClass("tipp-custom-button");
+
+
         $.getJSON("/SchoolFaculty/GetAllInstitutionModule?mid=" + document.getElementById("mid").value,
             function (response) {
                 $("#search_text").bind("keyup", function (e) {

@@ -1,8 +1,9 @@
 ﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+@using MRTD.Core.Common;
 
 @{
     ViewData["Title"] = "Learner";
-    string mid = ViewBag.MemGuid;
+    string mid = Session.AppSession["MemberID"].ToString();
     int Month = DateTime.Now.Month;
     LoginBusinessComponent component = new LoginBusinessComponent();
     var memberProfile = component.GetMemberProfileByMemberId(mid);

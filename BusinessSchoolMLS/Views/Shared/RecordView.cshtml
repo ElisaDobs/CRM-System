@@ -1,11 +1,11 @@
-﻿@using BusinessSchoolMLS.SchoolBusinessComponent;
+﻿@model MRTD.Core.Models.MemberViewModel;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
 
 @{
-    ViewData["Title"] = "Qualification Academic Records";
     LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
     OnlineModuleActivityBusinessComponent onlineModuleActivityBusinessComponent = new OnlineModuleActivityBusinessComponent();
-    string mguid = ViewBag.MemGuid,
-           sguid = ViewBag.StudentGuid,
+    string mguid = Model.MUID,
+           sguid = Model.UID,
            ssguid = string.Empty;
 
     if (!string.IsNullOrEmpty(sguid))
@@ -17,8 +17,8 @@
         ssguid = mguid;
     }
     int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(ssguid);
-    int QualID = ViewBag.QualID;
-    int ActivityID = ViewBag.ActivityID;
+    int QualID = Model.QualID;
+    int ActivityID = Model.ActivityID;
     var all_module_academics = onlineModuleActivityBusinessComponent.GetAcademicRecordByMemberID(QualID, MemberID, ActivityID);
     var qual_obj = onlineModuleActivityBusinessComponent.GetAllQualificationAcademicRecordByMemberID(MemberID).FirstOrDefault(qual => qual.QualificationID == QualID);
 }
@@ -29,8 +29,9 @@
         <input type="hidden" name="MemberID" value="@ssguid" />
         <input type="hidden" name="QualificationID" value="@QualID" />
         <input type="hidden" name="ActivityID" value="@ActivityID" />
-        <img src="~/pdf-icon.png" width="50" height="50" />
-        <input type="submit" value="Download" class="btn btn-default" />
+        <button type="submit" class="dt-button tipp-custom-button">
+            <span class="glyphicon glyphicon-download"></span> Download
+        </button>
     }
 </div>
 <div>

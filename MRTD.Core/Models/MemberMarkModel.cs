@@ -6,6 +6,7 @@ namespace MRTD.Core.Models
 {
     public class MemberMarkModel
     {
+        public int ActivityID { get; set; }
         public string IDNo { get; set; }
 
         public string UnitName { get; set; }

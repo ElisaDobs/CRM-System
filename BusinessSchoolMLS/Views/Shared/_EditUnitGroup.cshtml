@@ -1,0 +1,39 @@
+﻿@model MRTD.Core.Models.MemberViewModel;
+
+
+@using (Html.BeginForm("SaveUnitGroup", string.Format("SchoolFaculty"), FormMethod.Post))
+{
+    <input type="hidden" name="MemberID" value="@Model.MUID" />
+    <div class="form-group">
+        <label for="GroupName">Group Name</label>
+        <input type="text" name="GroupName" value="@Model.Group.GroupName" class="form-control" validation="required" />
+    </div>
+    <div class="form-group">
+        <label for="ModuleID">Unit Name</label>
+        <select type="text" name="ModuleID" value="@Model.Group.ModuleID" class="form-control" validation="select">
+            @foreach (var module in Model.Group.ModuleList)
+            {
+                if (module.Text.ToString() == Model.ModuleName)
+                {
+                    <option value="@module.Value.ToString()" selected="selected">@module.Text.ToString()</option>
+                }
+                else
+                {
+                    <option value="@module.Value.ToString()">@module.Text.ToString()</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="AttDate">Attendence Date</label>
+        <input type="date" name="AttDate" value="@Model.Group.AttDate.ToString("yyyy-MM-dd")" class="form-control" validation="date" />
+    </div>
+    <div class="form-group">
+        <label for="AttTime">Attendence Time</label>
+        <input type="time" name="AttTime" value="@TimeSpan.Parse(Model.Group.AttTime.ToString("HH:mm"))" class="form-control" validation="date" />
+    </div>
+    <div class="tipp-btn-container">
+        <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>
+        <button type="button" class="btn btn-primary tipp-custom-button" data-dismiss="modal">Cancel</button>
+    </div>
+}

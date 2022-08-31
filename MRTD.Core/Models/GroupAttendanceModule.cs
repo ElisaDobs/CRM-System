@@ -7,6 +7,7 @@ namespace MRTD.Core.Models
 {
     public class GroupAttendanceModule
     {
+        public string MemberID { get; set; }
         public string GroupName { get; set; } 
 
         public string FullName { get; set; }

@@ -14,6 +14,45 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
         public ModuleActivityBusinessComponent()
         { }
 
+        public bool UpdateUnitNewsFeed(NewFeedModel newFeedModel)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ReturnType = DataReturnType.NonQuery;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter = newFeedModel.MappingParameters();
+
+                int Count = (int)CommonDataAccess.Process(model);
+                return Count > 0;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        public bool RemoveNewsFeedFromUnit(int FeedID, int MemberID)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.ReturnType = DataReturnType.NonQuery;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter.Set("FeedID", FeedID);
+                model.ApplicationParameter.Set("MemberID", MemberID);
+
+                int Count = (int)CommonDataAccess.Process(model);
+                return Count > 0;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+
         public List<SchoolNewsFeedModel> GetAllNewsFeedByClientID(string ClientId)
         {
             try
@@ -24,7 +63,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 model.CommandType = CommandType.StoredProcedure;
                 model.ApplicationParameter.Set("ClientId", ClientId);
                 
-                return (List<SchoolNewsFeedModel>)CommonDataAccess.Process<SchoolNewsFeedModel>(model); ;
+                return (List<SchoolNewsFeedModel>)CommonDataAccess.Process<SchoolNewsFeedModel>(model);
             }
             catch (Exception exception)
             {

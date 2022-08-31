@@ -8,6 +8,7 @@ namespace MRTD.Core.Models
 {
     public class NewFeedModel : BaseModel
     {
+        public int FeedID { get; set; }
         [Display(Name = "News Feed Heading")]
         public string FeedHeader { get; set; }
         [Display(Name = "Feed Description")]

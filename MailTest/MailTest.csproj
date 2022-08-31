@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MRTD.Core">
-      <HintPath>..\MRTD.DAL\bin\Debug\netstandard2.0\MRTD.Core.dll</HintPath>
+      <HintPath>..\MRTD.Core\bin\Debug\netstandard2.0\MRTD.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

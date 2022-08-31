@@ -1,0 +1,41 @@
+﻿@model MRTD.Core.Models.MemberViewModel;
+@using BusinessSchoolMLS.SchoolBusinessComponent
+@using MRTD.Core.Models;
+@using Microsoft.AspNetCore.Mvc;
+
+@{
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+    ModuleActivityBusinessComponent moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
+    string mguid = Model.MUID;
+    int ModuleID = Model.ModuleID;
+    int ModuleActivityID = Model.ActivityID;
+    var lst_all_activities = moduleActivityBusinessComponent.GetAllActivity();
+    List<MemberModuleActivityModel> lst_all_members = lst_all_members = moduleActivityBusinessComponent.GetAllMemberByModuleActivityID(ModuleID, ModuleActivityID);
+}
+
+<div>
+    <table id="tippUnitActivityTable-@Model.ModuleID" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Unit ID</th>
+                <th>Activity Type</th>
+                <th>Activity Mark</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var member in lst_all_members)
+            {
+                <tr>
+                    <td>@member.FirstName</td>
+                    <td>@member.LastName</td>
+                    <td>@member.UnitCode</td>
+                    <td>@member.ActivityName</td>
+                    <td>@member.ActivityMark</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

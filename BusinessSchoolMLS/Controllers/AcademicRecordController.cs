@@ -12,6 +12,7 @@ using iTextSharp.text;
 using MRTD.Core.Models;
 using MRTD.Core.Extensions;
 using MRTD.Core.Common;
+using BusinessSchoolMLS.SchoolBusinessComponent;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,7 +20,27 @@ namespace BusinessSchoolMLS.Controllers
 {
     public class AcademicRecordController : Controller
     {
+        private readonly FacultyBusinessComponent _facultyBusinessComponent;
         // GET: /<controller>/
+        public AcademicRecordController()
+        {
+            _facultyBusinessComponent = new FacultyBusinessComponent();
+        }
+        public IActionResult ProgramStudents(string mid, int pid)
+        {
+            try
+            {
+                if (pid != 0)
+                {
+                    Session.AppSession.Add("ProgramID", pid);
+                }
+            }
+            catch (Exception exception)
+            {
+
+            }
+            return View();
+        }
         public IActionResult Index()
         {
             return View();
@@ -39,9 +60,9 @@ namespace BusinessSchoolMLS.Controllers
                         ViewBag.ModuleActivityID = data.ModuleActivityID.ToString();
                         Session.AppSession.Remove(mid); //Clear Session
                     }
-                }                
+                }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 LogMessageBusinessComponent.InsertLogMessage(mid, MessageNode.SYS_MODULE_ACTIVITY_REPORT_ERROR, exception.ToString());
             }
@@ -57,7 +78,7 @@ namespace BusinessSchoolMLS.Controllers
                     ViewBag.StudentGuid = sid;
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 LogMessageBusinessComponent.InsertLogMessage(mid, MessageNode.SYS_STUDENT_ACADEMIC_RECORD_ERROR, exception.ToString());
             }
@@ -77,7 +98,7 @@ namespace BusinessSchoolMLS.Controllers
                     });
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 LogMessageBusinessComponent.InsertLogMessage(HttpContext.Request.Form["MemberID"], MessageNode.SYS_MODULE_ACTIVITY_REPORT_ERROR, exception.ToString());
             }
@@ -93,7 +114,7 @@ namespace BusinessSchoolMLS.Controllers
                     ViewBag.MemGuid = mid;
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
 
             }
@@ -112,7 +133,7 @@ namespace BusinessSchoolMLS.Controllers
                     ViewBag.ActivityID = 3;
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 LogMessageBusinessComponent.InsertLogMessage(mid, MessageNode.SYS_STUDENT_ACADEMIC_RECORD_ERROR, exception.ToString());
             }
@@ -121,7 +142,7 @@ namespace BusinessSchoolMLS.Controllers
 
         [HttpPost]
         [Obsolete]
-        public FileResult AcademicDownLoad([FromForm]DownLoadModel downLoadModel)
+        public FileResult AcademicDownLoad([FromForm] DownLoadModel downLoadModel)
         {
             string member_Guid = downLoadModel.AdminMemberID;
             byte[] bytes = null;
@@ -163,7 +184,7 @@ namespace BusinessSchoolMLS.Controllers
 
         [HttpPost]
         [Obsolete]
-        public FileResult ReportDownload([FromForm]DownLoadModel model)
+        public FileResult ReportDownload([FromForm] DownLoadModel model)
         {
             string member_Guid = model.AdminMemberID;
             byte[] bytes = null;

@@ -10,9 +10,9 @@
     string mid = string.Empty;
     if (ViewBag.Title != "Login")
     {
-        if (ViewBag.MemGuid != null)
+        if (Session.AppSession.ContainsKey("MemberID"))
         {
-            mid = ViewBag.MemGuid;
+            mid = Session.AppSession["MemberID"].ToString();
             int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(mid);
             lst_all_menus = administratorBusinessComponent.GetMenuListByNemberID(MemberID);
         }
@@ -68,6 +68,16 @@
                 -moz-border-radius: 6px 0 6px 6px;
                 border-radius: 6px 0 6px 6px;
             }
+
+    .tipp-redirect-link {
+        color: #ffffff;
+    }
+
+    .tipp-custom-logout-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
 </style>
 
 @if (ViewBag.Title != "Login")
@@ -173,8 +183,10 @@
             }
         </ul>
     }
-    <div style="float: right; top: 10px; vertical-align: middle; height: 50px;">
-        <button type="button" class="btn btn-default" style="color: #377091;">@Html.ActionLink("Log out", "LogOut", "Login", new { mid = mid })</button>
-    </div>
+    <!--<div >
+        <button type="button" class="btn btn-primary tipp-custom-logout-button">
+            @Html.ActionLink("Log out", "LogOut", "Login", new { mid = mid }, new { @class = "glyphicon glyphicon-log-out tipp-redirect-link" })
+        </button>
+    </div>-->
 }
 

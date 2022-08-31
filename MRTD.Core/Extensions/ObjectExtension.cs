@@ -89,9 +89,10 @@ namespace MRTD.Core.Extensions
         public static string StudentHeader(this string html_string, StudentModel studentModel)
         {
             html_string = html_string.Replace("#FULLNAME#", studentModel.FullName);
-            html_string = html_string.Replace("#STUDENTNO#", studentModel.StudentNumber);
+            html_string = html_string.Replace("#STUDENTNO#", studentModel.IDNo);
             html_string = html_string.Replace("#QUALIFICATIONNAME#", studentModel.QualificationName);
             html_string = html_string.Replace("#ACADEMICYEAR#", studentModel.AcademicYear.ToString());
+            html_string = html_string.Replace("#COMPLETEDYEAR#", studentModel.CompletedYear > 1900 ? studentModel.CompletedYear.ToString() : "----");
             html_string = html_string.Replace("#QUALIFICATIONSTATUS#", studentModel.QualificationStatus);
 
             return html_string;

@@ -482,5 +482,45 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 throw exception;
             }
         }
+
+        public bool RemoveStudentFromUnitGroup(int GroupID, int MemberID)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.ReturnType = DataReturnType.NonQuery;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter.Set("GroupID", GroupID);
+                model.ApplicationParameter.Set("MemberID", MemberID);
+                int Count = (int)CommonDataAccess.Process(model);
+
+                return Count > 0;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        public List<StudentModel> GetProgramStudentByProgramId(int ProgramID)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.ReturnType = DataReturnType.Fill;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter.Set("ProgramId", ProgramID);
+
+                var students = (List<StudentModel>)CommonDataAccess.Process<StudentModel>(model);
+
+                return students;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
     }
 }

@@ -195,7 +195,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 model.ApplicationParameter.Set("QualificationID", QualificationID);
                 model.ApplicationParameter.Set("ActivityID", ActivityID);
 
-                return (List<AcademicRecordModel>)CommonDataAccess.Process< AcademicRecordModel>(model); 
+                return (List<AcademicRecordModel>)CommonDataAccess.Process<AcademicRecordModel>(model); 
             }
             catch (Exception exception)
             {

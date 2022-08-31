@@ -16,7 +16,6 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
 {
     public class NotificationBusinessComponent
     {
-        private readonly NotificationModel notificationModel;
         public NotificationBusinessComponent(){}
 
         public bool InsertSystemNotification(int TemplateID, Guid MemberID, string ApplicationID, int AttachmentID = 0)

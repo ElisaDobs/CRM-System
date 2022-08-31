@@ -2,7 +2,7 @@
 @using MRTD.Core.Models;
 
 @{
-    ViewData["Title"] = "Unit Group Attendance";
+    ViewData["Title"] = "Unit Group";
     string mguid = ViewBag.MemGuid;
     int GroupID = ViewBag.GroupID;
 
@@ -10,7 +10,7 @@
 
     ModuleActivityBusinessComponent moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
 
-    List<ModuleMemberModel> moduleMemberModels = moduleActivityBusinessComponent.GetRegisteredByGroupID(GroupID);
+    List<ModuleMemberModel> studentsRegisteredUnit = moduleActivityBusinessComponent.GetRegisteredByGroupID(GroupID);
 
     List<ModuleMemberModel> lst_all_modules = facultyBusinessComponent.GetAttendanceStudentsByGroupID(GroupID);
 
@@ -19,40 +19,115 @@
     ModuleGroupModel moduleGroupModel = facultyBusinessComponent.GetModuleGroupByGroupID(GroupID);
 }
 
-<script type="text/javascript">
-
-    function addFunction() {
-        $("#RegisteredAtt > option:selected").each(function (index) {
-            var option = $("<option value=\"" + $(this).attr("value") + "\" selected=\"selected\">" + $(this).text() + "</option>")
-            $("#MemberID").append(option);
-            $(this).remove();
-        });
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
     }
 
-    function removeFunction() {
-        $("#MemberID > option:selected").each(function (index) {
-            var option = $("<option value=\"" + $(this).attr("value") + "\" selected>" + $(this).text() + "</option>")
-            $("#RegisteredAtt").append(option);
-            $(this).remove();
-        });
+    .tipp-label {
+        color: #377091;
     }
 
-</script>
+    .tipp-input-field {
+        width: 85%;
+    }
 
-<div>
-    &nbsp;
-</div>
-<div>
-    <h4 style="color: #6d2829;">Unit Group Attendance - @moduleGroupModel.GroupName</h4>
-</div>
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
 
-<div>
-    <button type="button" data-toggle="modal" class="btn btn-default" data-target="#create-att">Add Attendant</button>
-</div>
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
 
-<div>
-    <div class="table-responsive">
-        <table class="table">
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+        width: 75%;
+    }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091 !important;
+    }
+</style>
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">Unit Group - @moduleGroupModel.GroupName</h4>
+    </div>
+    <div>
+        <table id="tippGroupStudentListTable" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>Group Name</th>
@@ -61,6 +136,7 @@
                     <th>E-Email Address</th>
                     <th>Date</th>
                     <th>Time</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -73,6 +149,11 @@
                         <td>@attendant.EmailAddress</td>
                         <td>@attendant.AttDate.ToString("yyyy - MM - dd")</td>
                         <td>@attendant.AttTime</td>
+                        <td align="center">
+                            <a class="btn btn-primary btn-sm tipp-custom-grid-button" href="@Url.Action("RemoveStudentFromGroup", "SchoolFaculty", new { mid = mguid, gid=GroupID, stdid = attendant.MemberID })">
+                                <span class="glyphicon glyphicon-remove"></span> Delete
+                            </a>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -80,59 +161,69 @@
     </div>
 </div>
 
-<div id="create-att" class="modal fade">
+<div id="CreateStudentGroupList" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Add Attendant</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title tipp-header">Unit Students</h4>
             </div>
             <div class="modal-body">
                 @using (Html.BeginForm("SaveUnitGroupMembers", string.Format("SchoolFaculty"), FormMethod.Post))
                 {
                     <input type="hidden" name="UserID" value="@mguid" />
                     <input type="hidden" name="GroupID" value="@GroupID" />
-                    <div style="width: 100%; display: inline-block;">
-                        <div style="width: 30%; display: inline-block;">
-                            <div class="form-group">
-                                <label for="RegisteredAtt">Unit Registered</label>
-                                <select class="form-control" name="RegisteredAtt" id="RegisteredAtt" style="height: 200px;" multiple>
-                                    @foreach (var registered in moduleMemberModels)
-                                    {
-                                    <option value="@registered.MemberID">@registered.FullName</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        <div style="width: 20%; display: inline-block; vertical-align: middle; text-align:center; height: 200px;">
-                            <div>
-                                <button type="button" id="btnAdd" onclick="addFunction()" class="btn btn-default" style="width: 100px;">Add</button>
-                            </div>
-                            <div>
-                                &nbsp;
-                            </div>
-                            <div>
-                                <button type="button" id="btnRemove" onclick="removeFunction()" class="btn btn-default" style="width: 100px;">Remove</button>
-                            </div>
-                        </div>
-                        <div style="width: 30%; display: inline-block;">
-                            <div class="form-group">
-                                <label for="MemberID">Group Attendants</label>
-                                <select class="form-control" name="MemberID" id="MemberID" style="height: 200px;" multiple>
-                                    @foreach(var att in lst_all_modules)
-                                    {
-                                        <option value="@att.MemberID">@att.FullName</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="width: 100%; text-align: center;">
-                        <button type="submit" class="btn btn-default" style="width: 100px;" data-toggle="modal">Save</button>
-                        <button type="button" class="btn btn-default" style="width: 100px;" data-dismiss="modal">Cancel</button>
+                    <table id="registerStudentTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Full Name
+                                </th>
+                                <th>
+                                    Cell No
+                                </th>
+                                <th>
+                                    E-mail Address
+                                </th>
+                                <th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var registered in studentsRegisteredUnit)
+                            {
+                                <tr>
+                                    <td>@registered.FullName</td>
+                                    <td>@registered.CellNo</td>
+                                    <td>@registered.EmailAddress</td>
+                                    <td><input type="checkbox" name="MemberID" value="@registered.MemberID" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>
+                        <button type="button" class="btn btn-default tipp-custom-button" data-dismiss="modal">Cancel</button>
                     </div>
                 }
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#tippGroupStudentListTable").DataTable({
+            dom: 'Bfrtip',
+            buttons: [{
+                text: "Add Student"
+            }]
+        });
+
+        $("button.dt-button").attr("data-toggle", "modal");
+        $("button.dt-button").attr("data-target", "#CreateStudentGroupList");
+        $("button.dt-button").addClass("tipp-custom-button");
+
+        $("#registerStudentTable").DataTable({});
+    });
+</script>

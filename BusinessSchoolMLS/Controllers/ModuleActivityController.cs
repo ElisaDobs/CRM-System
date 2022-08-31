@@ -29,31 +29,80 @@ namespace BusinessSchoolMLS.Controllers
             _notificationBusinessComponent = new NotificationBusinessComponent();
             _loginBusinessComponent = new LoginBusinessComponent();
         }
+
+        public IActionResult SaveNewsFeed([FromForm] NewFeedModel feedModel)
+        {
+            int member_id = 0;
+            try
+            {
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(feedModel.MemberID);
+                _moduleActivityBusinessComponent.InsertNewsFeed(feedModel);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp News Feed", "News Feed is successfully added.", member_id);
+            }
+            catch (Exception exception)
+            {
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp News Feed", "News Feed is unsuccessfully added.", member_id);
+            }
+            return RedirectToAction("CreateNewsFeed", "ModuleActivity", new { mid = feedModel.MemberID });
+        }
+        public IActionResult UpdateNewsFeed([FromForm]NewFeedModel feedModel)
+        {
+            int member_id = 0;
+            try
+            {
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(feedModel.MemberID);
+                _moduleActivityBusinessComponent.UpdateUnitNewsFeed(feedModel);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp News Feed", "News Feed is successfully added.", member_id);
+            }
+            catch(Exception exception)
+            {
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp News Feed", "News Feed is unsuccessfully added.", member_id);
+            }
+            return RedirectToAction("CreateNewsFeed", "ModuleActivity", new { mid = feedModel.MemberID });
+        }
+
+        public IActionResult DeleteNewFeed(string mid, int fid)
+        {
+            int member_id = 0;
+            try
+            {
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+                _moduleActivityBusinessComponent.RemoveNewsFeedFromUnit(fid, member_id);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp News Feed", "News Feed is successfully removed.", member_id);
+            }
+            catch(Exception exception)
+            {
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp News Feed", "News Feed is unsuccessfully removed.", member_id);
+            }
+            return RedirectToAction("CreateNewsFeed", "ModuleActivity", new { mid = mid });
+        }
+
         // GET: /<controller>/
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Activities(ModuleActivityModel moduleActivityModel)
+        public IActionResult Activities(string mid, string qid, string fid)
         {
+            ModuleActivityModel moduleActivityModel = new ModuleActivityModel();
             try
             {
-                if (!string.IsNullOrEmpty(HttpContext.Request.Query["mid"].ToString()))
+                if (!string.IsNullOrEmpty(mid))
                 {
-                    if (!string.IsNullOrEmpty(HttpContext.Request.Query["qid"]))
+                    if (!string.IsNullOrEmpty(qid))
                     {
-                        ViewBag.QualID = Int32.Parse(HttpContext.Request.Query["qid"]);
-                        ViewBag.FacultyID = Int32.Parse(HttpContext.Request.Query["fid"]);
+                        ViewBag.QualID = Int32.Parse(qid);
+                        ViewBag.FacultyID = Int32.Parse(fid);
                     }
                     else
                     {
-                        if (Session.UserSession.ContainsKey(HttpContext.Request.Query["mid"].ToString()))
+                        if (Session.UserSession.ContainsKey(mid))
                         {
-                            var user_session = (FacultyQualificationModel)(Session.UserSession[HttpContext.Request.Query["mid"].ToString()]);
+                            var user_session = (FacultyQualificationModel)(Session.UserSession[mid]);
                             ViewBag.QualID = user_session.QualificationID;
                             ViewBag.FacultyID = user_session.FacultyID;
-                            Session.UserSession.Remove(HttpContext.Request.Query["mid"].ToString());
+                            Session.UserSession.Remove(mid);
                         }
                     }
                     ViewBag.ModuleID = Int32.Parse(HttpContext.Request.Query["modid"]);
@@ -71,7 +120,7 @@ namespace BusinessSchoolMLS.Controllers
             }
             catch (Exception exception)
             {
-                LogMessageBusinessComponent.InsertLogMessage(HttpContext.Request.Query["mid"], MessageNode.SYS_MODULE_ACTIVITY_LOAD_ERROR, exception.ToString());
+                LogMessageBusinessComponent.InsertLogMessage(mid, MessageNode.SYS_MODULE_ACTIVITY_LOAD_ERROR, exception.ToString());
             }
             return View(moduleActivityModel);
         }
@@ -149,13 +198,15 @@ namespace BusinessSchoolMLS.Controllers
             return View();
         }
 
-        public IActionResult ModuleActivityMember(string mid)
+        public IActionResult ModuleActivityMember(string mid, int pid)
         {
             try
             {
                 if (!string.IsNullOrEmpty(mid))
                 {
                     ViewBag.MemGuid = mid;
+                    ViewBag.ProgramID = pid;
+                    ViewBag.ActivityID = 3; //This need to be changed for testing only
                     if (Session.AppSession.ContainsKey(string.Format("Activity_{0}", mid)))
                     {
                         MemberMarkModel model = (MemberMarkModel)Session.AppSession[string.Format("Activity_{0}", mid)];
@@ -227,7 +278,7 @@ namespace BusinessSchoolMLS.Controllers
         }
         public async Task<string> UploadUnitActivityMark([FromForm]UploadMarkModel model)
         {
-            string dataUpload = string.Empty;
+            UnitUploadFile unitUploadFile = new UnitUploadFile();
             try
             {
                 string filePath = string.Empty;
@@ -239,8 +290,14 @@ namespace BusinessSchoolMLS.Controllers
                 }
                 Guid importID = Guid.NewGuid();
                 int UserID = component.GetMemberIDByMemberGuid(model.UserID);
-                DataTable excelUpload = ExcelHelper.ProcessExcelData<MemberMarkModel>(filePath, importID, UserID);
-                dataUpload = GetMarkUploadGrid(excelUpload?.ToList<MemberMarkModel>());
+                DataTable? excelUpload = ExcelHelper.ProcessExcelData<MemberMarkModel>(filePath, importID, UserID);
+                unitUploadFile.ModuleID = model.ModuleID;
+                unitUploadFile.MemberMarks  = excelUpload.ToList<MemberMarkModel>();
+                if (Session.AppSession.ContainsKey(string.Format("DataUpload_{0}", model.UserID)))
+                {
+                    Session.AppSession.Remove(string.Format("DataUpload_{0}", model.UserID));
+                    Session.AppSession.Remove(string.Format("Import_{0}", model.UserID));
+                }
                 Session.AppSession.Set(string.Format("DataUpload_{0}", model.UserID), excelUpload);
                 Session.AppSession.Set(string.Format("Import_{0}", model.UserID), importID);
             }
@@ -248,7 +305,7 @@ namespace BusinessSchoolMLS.Controllers
             {
 
             }
-            return dataUpload;
+            return JsonConvert.SerializeObject(unitUploadFile);
         }
 
         private string GetMarkUploadGrid(List<MemberMarkModel> marks)
@@ -309,28 +366,21 @@ namespace BusinessSchoolMLS.Controllers
             return View();
         }
 
-        public IActionResult CloseChat()
+        public IActionResult CloseChat(string mid, int chatid)
         {
+            int member_id = 0;
             try
             {
-                string MemberID = HttpContext.Request.Form["MemberID"].ToString();
-                string chatsToBeClosed = HttpContext.Request.Form["CloseChat"].ToString();
-                if (!string.IsNullOrEmpty(chatsToBeClosed))
-                {
-                    string[] chats = chatsToBeClosed.Split(',');
-                    ModuleActivityBusinessComponent component = new ModuleActivityBusinessComponent();
-                    foreach (string key in chats)
-                    {
-                        component.DeactivateChat(Convert.ToInt32(key));
-                    }
-                }
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+                _moduleActivityBusinessComponent.DeactivateChat(chatid);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Unit Chat", "Tipp Unit Chat has been closed.", member_id);
             }
             catch (Exception exception)
             {
-
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Unit Chat", "Tipp Unit Chat is unsuccessfully closed.", member_id);
             }
 
-            return RedirectToAction("CreatChat", "ModuleActivity", new { mid = HttpContext.Request.Form["MemberID"].ToString() });
+            return RedirectToAction("CreatChat", "ModuleActivity", new { mid = mid });
         }
 
         public IActionResult ManageChat(string mid, int cid)
@@ -457,20 +507,6 @@ namespace BusinessSchoolMLS.Controllers
 
             }
             return View(newFeed);
-        }
-
-        public IActionResult SaveNewsFeed([FromForm]NewFeedModel feedModel)
-        {
-            try
-            {
-                ModuleActivityBusinessComponent businessComponent = new ModuleActivityBusinessComponent();
-                businessComponent.InsertNewsFeed(feedModel);
-            }
-            catch(Exception exception)
-            {
-
-            }
-            return RedirectToAction("CreateNewsFeed", "ModuleActivity", new { mid = feedModel.MemberID });
         }
 
         public string GetAllMemberByModuleID(string module_id)
@@ -634,6 +670,40 @@ namespace BusinessSchoolMLS.Controllers
 
             }
             return response;
+        }
+
+        public IActionResult ExportDataToExcel(string mid, int mod_id, int maid)
+        {
+            string fileName = "Report";
+            StringBuilder activityGrid = new StringBuilder();
+            List<MemberModuleActivityModel> lst_all_members = _moduleActivityBusinessComponent.GetAllMemberByModuleActivityID(mod_id, maid);
+
+            activityGrid.Append("<table>");
+            activityGrid.Append("<thead>");
+            activityGrid.Append("<thead>");
+            activityGrid.Append("<tr>");
+            activityGrid.Append("<th>First Name</th>");
+            activityGrid.Append("<th>Last Name</th>");
+            activityGrid.Append("<th>Unit ID</th>");
+            activityGrid.Append("<th>Activity Type</th>");
+            activityGrid.Append("<th>Activity Mark</th>");
+            activityGrid.Append("</tr>");
+            activityGrid.Append("</thead>");
+            activityGrid.Append("<tbody>");
+            foreach (var member in lst_all_members)
+            {
+                activityGrid.Append("<tr>");
+                activityGrid.Append($"<td>{member.FirstName}</td>");
+                activityGrid.Append($"<td>{member.LastName}</td>");
+                activityGrid.Append($"<td>{member.UnitCode}</td>");
+                activityGrid.Append($"<td>{member.ActivityName}</td>");
+                activityGrid.Append($"<td>{member.ActivityMark}</td>");
+                activityGrid.Append("</tr>");
+            }
+            activityGrid.Append("</tbody>");
+            activityGrid.Append("</table>");
+
+            return File(Encoding.ASCII.GetBytes(activityGrid.ToString()), "application/vnd.ms-excel", string.Format("{0}.xls", fileName));
         }
     }
 }

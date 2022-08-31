@@ -161,7 +161,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
             }
         }
 
-        public MemberProfileModel GetMemberProfileByMemberId(string MemberID)
+        public MemberProfileModel? GetMemberProfileByMemberId(string MemberID)
         {
             try
             {
@@ -171,8 +171,14 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 model.CommandType = CommandType.StoredProcedure;
                 model.ApplicationParameter.Set("MemberId", Guid.Parse(MemberID));
                 var lst_profile = (List<MemberProfileModel>)CommonDataAccess.Process<MemberProfileModel>(model);
-
-                return lst_profile?.FirstOrDefault();
+                if (lst_profile != null)
+                {
+                    return lst_profile.FirstOrDefault();
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception exception)
             {

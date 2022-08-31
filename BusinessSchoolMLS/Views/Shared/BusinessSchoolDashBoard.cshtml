@@ -1,7 +1,9 @@
-﻿@{ 
+﻿@using MRTD.Core.Common;
+
+@{ 
      ViewData["Title"] = "Dash Board";
     int acad_year = ViewBag.AcademicYear;
-    string mguid = ViewBag.MemGuid;
+    string mguid = Session.AppSession["MemberID"].ToString();
 }
 
 

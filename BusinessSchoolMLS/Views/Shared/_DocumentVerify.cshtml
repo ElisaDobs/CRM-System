@@ -1,0 +1,110 @@
+﻿@model MRTD.Core.Models.MemberViewModel;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+@using MRTD.Core.Models;
+@using MRTD.Core.Common;
+
+
+@{
+
+    ApplicationBusinessComponent applicationBusinessComp = new ApplicationBusinessComponent();
+
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+
+    int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(Model.UID);
+
+    int EnrollmentStatusID = applicationBusinessComp.GetEnrollmentStatusByMemberID(MemberID);
+
+    List<RequiredUploadedDocModel> lst_all_documents = applicationBusinessComp.GetUploadedDocumentByMemberID(MemberID);
+}
+<div>
+    <table id="tippDocumentTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    File Name
+                </th>
+                <th>
+                    Upload Type
+                </th>
+                <th>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (lst_all_documents.Count() > 0)
+            {
+                @foreach (var document in lst_all_documents)
+                {
+                    <tr>
+                        <td>@document.UploadFileName</td>
+                        <td>@document.UploadTypeName</td>
+                        <td align="center">
+                            @using (Html.BeginForm("DownloadDocuments", "Administration", FormMethod.Post))
+                            {
+                                <input type="hidden" name="@document.UploadID" value="@document.UploadFileName" />
+                                <button type="submit" class="btn btn-primary tipp-custom-grid-button">
+                                    <span class="glyphicon glyphicon-download"></span> Download
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" align="center">No Data</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    @using (Html.BeginForm("ApproveMemberEnrollement", "Administration", FormMethod.Post))
+    {
+        <input type="hidden" name="ApproverID" value="@Model.MUID" />
+        <input type="hidden" name="ProspectiveID" value="@Model.UID" />
+        <input type="hidden" name="EnrollmentStatusID" value="@EnrollmentStatusID" />
+        <div style="width: 100%; display: inline-block">
+            <div style="width: 40%; display: inline-block;">
+                <label for="radio">Approve/Decline documents:</label>
+                <br />
+                @if (lst_all_documents.Count > 0)
+                {
+                    <input type="radio" name="Approved" value="1" id="1" /><span> Approve</span>
+                    <br />
+                    <input type="radio" name="Approved" value="0" id="0" /><span> Decline</span>
+                }
+                else
+                {
+                    <input type="radio" name="Approved" value="1" id="1" disabled="disabled" /><span> Approve</span>
+                    <br />
+                    <input type="radio" name="Approved" value="0" id="0" disabled="disabled" /><span> Decline</span>
+                }
+            </div>
+            <div id="RejectionComment" style="width: 100%;" class="form-group">
+                <label for="DisApproveComments">Rejection Comments (Comment only if the documents has been rejected)</label>
+                @if (lst_all_documents.Count > 0)
+                {
+                    <textarea class="form-control" name="DisApproveComments" id="DisApproveComments" rows="5" cols="200"></textarea>
+                }
+                else
+                {
+                    <textarea class="form-control" name="DisApproveComments" id="DisApproveComments" rows="5" cols="200" disabled="disabled"></textarea>
+                }
+            </div>
+            <div style="width: 100%; text-align: center;">
+                @if (lst_all_documents.Count > 0)
+                {
+                    <button type="submit" class="btn btn-primary tipp-custom-button">Submit</button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary tipp-custom-button" disabled="disabled">Submit</button>
+                }
+                <button type="button" class="btn btn-primary tipp-custom-button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    }
+</div>

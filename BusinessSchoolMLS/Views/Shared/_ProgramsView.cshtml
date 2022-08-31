@@ -1,0 +1,47 @@
+﻿@using MRTD.Core.Common;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    var faculty_component = new FacultyBusinessComponent();
+    var lst_all_fac_quals = faculty_component.GetAllFacultyQualificationByFacultyID(8);
+}
+<div>
+    <table id="tippQualificationTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Unit ID</th>
+                <th>Name</th>
+                <th>Program</th>
+                <th>NQF Level</th>
+                <th>Credits</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var qual in lst_all_fac_quals)
+            {
+                <tr>
+                    <td>@qual.UnitCode</td>
+                    <td>@qual.QualificationName</td>
+                    <td>@qual.QualificationType</td>
+                    <td>@qual.QualificationNQLevel</td>
+                    <td>@qual.Credit</td>
+                    <td align="center">
+                        <input type="radio" name="qualification_select" value="@qual.QualificationID" onclick="javascript:PopulateQualification('@qual.QualificationID', '@qual.QualificationName')" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+
+    function PopulateQualification(qualificationId, qualificationName) {
+        $("#QualificationID").val(qualificationId);
+        $("#_QualificationID").val(qualificationName);
+    }
+
+    $(document).ready(function () {
+        $("#tippQualificationTable").DataTable({});
+    });
+</script>

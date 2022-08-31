@@ -2,105 +2,256 @@
 @using BusinessSchoolMLS.SchoolBusinessComponent;
 
 @{
-    ViewData["Title"] = "Module Activity Members";
+    ViewData["Title"] = "Program Units";
     ModuleActivityBusinessComponent moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
     string mguid = ViewBag.MemGuid;
+    int qual_id = ViewBag.ProgramID;
+    int ActivityID = ViewBag.ActivityID;
+    var faculty_component = new FacultyBusinessComponent();
+    var lst_all_qual_modules = faculty_component.GetAllFacultyModuleByQualificationID(qual_id);
     List<StudentActivityMarkModel> lst_all_members = null;
     if (ViewBag.UnitCode != null && ViewBag.ActivityName != null && ViewBag.ActivityDate != null)
     {
         lst_all_members = moduleActivityBusinessComponent.GetAllMemberUnitMarkByActivityDate(ViewBag.UnitCode, ViewBag.ActivityName, ViewBag.ActivityDate);
     }
 }
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
 
+    .tipp-label {
+        color: #377091;
+    }
 
-<div>
-    &nbsp;
-</div>
-<div>
-    <h4 style="color: #6d2829;">Unit Activity Students</h4>
-</div>
-<div>
-    <form id="postForm" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="UserID" id="UserID" value="@mguid" />
-        <div class="form-group">
-            <label for="ActivityMarkValue">Upload Bulk Marks</label>
-            <input type="file" name="FormFile" id="FormFile" class="form-control" />
-        </div>
-        <div class="form-group">
-            <button type="submit" id="viewMark" class="btn btn-default" style="width: 100px;">View</button>
-        </div>
-    </form>
-</div>
-<div class="modal fade" id="viewUploadMarks" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Activity Mark</h5>
-                <button type="submit" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            </div>
-            <div class="modal-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>IDNo</th>
-                            <th>Unit Code</th>
-                            <th>Activity Name</th>
-                            <th>Activity Date</th>
-                            <th>Mark</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mark-body"></tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="5">
-                                <form method="post" action="/ModuleActivity/UploadBulkMark?mid=@mguid">
-                                    <div class="form-group">
-                                        <input type="submit" value="Upload" class="btn btn-default" />
-                                    </div>
-                                </form>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-@if (lst_all_members != null)
-{
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+        width: 75%;
+    }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091 !important;
+    }
+</style>
+<div class="tipp-top-heading">
     <div>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
+        <h4 class="tipp-header">Program Units</h4>
+    </div>
+    <div>
+        <table id="tippProgramUnits" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Name</th>
+                    <th>NQF Level</th>
+                    <th>Credits</th>
+                    <th>Level</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var qual_module in lst_all_qual_modules)
+                {
                     <tr>
-                        <th>FullName</th>
-                        <th>Unit Code</th>
-                        <th>Activity Name</th>
-                        <th>Activity Date</th>
-                        <th>Activity Mark</th>
-                        <th></th>
+                        <td>@qual_module.ModuleUnitCode</td>
+                        <td>@qual_module.ModuleName</td>
+                        <td>@qual_module.NQLevelID</td>
+                        <td>@qual_module.Credit</td>
+                        <td>@qual_module.AcademicLevelID</td>
+                        <td align="center">
+                            <button type="button" class="btn btn-default tipp-custom-button" data-toggle="modal" data-target="#@qual_module.ModuleID">
+                                <span class="glyphicon glyphicon-upload"></span> Upload Marks
+                            </button>
+                        </td>
+                        <td align="center">
+                            <button type="button" class="btn btn-default tipp-custom-button" data-toggle="modal" data-target="#@string.Format("Report-{0}", qual_module.ModuleID)">
+                                <span class="glyphicon glyphicon-list-alt"></span> View Report
+                            </button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var member in lst_all_members)
-                    {
-                        <tr>
-                            <td>@member.FullName</td>
-                            <td>@member.UnitCode</td>
-                            <td>@member.ActivityName</td>
-                            <td>@member.ActivityDate</td>
-                            <td>@member.ActivityMarkValue</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@foreach (var qual_module in lst_all_qual_modules)
+{
+    <div id="@qual_module.ModuleID" class="modal fade">
+        <div class="modal-dialog" style="width: 800px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title tipp-header">Activity Mark</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="vertical-align: bottom !important;">
+                        <form id="postForm" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="UserID" id="UserID" value="@mguid" />
+                            <input type="hidden" name="ModuleID" value="@qual_module.ModuleID" />
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td valign="middle" style="width: 30%;"><label for="ActivityMarkValue">Upload Mark File (.csv)</label></td>
+                                    <td valign="middle" style="width: 30%;"><input type="file" name="FormFile" id="FormFile" class="form-control" style="width: 290px !important; display: inline-block;" /></td>
+                                    <td valign="middle" style="width: 20%;">
+                                        <button type="submit" class="dt-button tipp-custom-button" style="display: inline-block;">
+                                            <span class="glyphicon glyphicon-upload"></span> Upload
+                                        </button>
+                                    </td>
+                                    <td valign="middle" style="width: 20%;">
+                                        <a href="@Url.Action("UploadBulkMark", "ModuleActivity", new { mid = mguid})" class="dt-button tipp-custom-button" style="display: inline-block;">
+                                            <span class="glyphicon glyphicon-import"></span> Publish
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                    <div>
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>IDNo</th>
+                                    <th>Unit Code</th>
+                                    <th>Activity Name</th>
+                                    <th>Activity Date</th>
+                                    <th>Mark</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tippActivityMark-@qual_module.ModuleID">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
 }
-<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
+
+@foreach (var module in lst_all_qual_modules)
+{
+    <div id="@string.Format("Report-{0}", module.ModuleID)" class="modal fade">
+        <div class="modal-dialog" style="width: 800px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title tipp-header">Activity Report</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.Partial("_UnitActivityReport", new MemberViewModel { MUID = mguid, ModuleID = Convert.ToInt32(module.ModuleID), ActivityID = ActivityID });
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var url = "/ModuleActivity/ExportDataToExcel?mid=20937C8E-C606-4516-9F5C-8A2EAB5BB4F0&&mod_id=14&maid=3";
+            $("#tippUnitActivityTable-" + @module.ModuleID).DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        text: 'Export To Excel',
+                        action: function () {
+                            window.open(url);
+                        }
+                    }
+                ]
+            });
+            $("button.dt-button").addClass("tipp-custom-button");
+        });
+    </script>
+}
+
+
 <script type="text/javascript">
     $(document).ready(function () {
+        $("#tippProgramUnits").DataTable({});
 
         $("form#postForm").submit(function (e) {
             e.preventDefault();
@@ -110,8 +261,17 @@
                 type: "post",
                 data: formData,
                 success: function (data) {
-                    $("#mark-body").html(data);
-                    $("#viewUploadMarks").modal();
+                    var result = JSON.parse(data);
+                    $("#tippActivityMark-" + result.ModuleID).empty();
+                    for (var index = 0; index < result.MemberMarks.length; index++) {
+                        $("#tippActivityMark-" + result.ModuleID).append("<tr>");
+                        $("#tippActivityMark-" + result.ModuleID).append($("<td>" + result.MemberMarks[index].IDNo + "</td>"));
+                        $("#tippActivityMark-" + result.ModuleID).append($("<td>" + result.MemberMarks[index].UnitName + "</td>"));
+                        $("#tippActivityMark-" + result.ModuleID).append($("<td>" + result.MemberMarks[index].UnitActivityName + "</td>"));
+                        $("#tippActivityMark-" + result.ModuleID).append($("<td>" + result.MemberMarks[index].ActivityMark + "</td>"));
+                        $("#tippActivityMark-" + result.ModuleID).append($("<td>" + result.MemberMarks[index].ActivityDate + "</td>"));
+                        $("#tippActivityMark-" + result.ModuleID).append("</tr>");
+                    }
                 },
                 cache: false,
                 contentType: false,
