@@ -13,8 +13,4 @@
     <ProjectReference Include="..\MRTD.Core\MRTD.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SQLScripts\" />
-  </ItemGroup>
-
 </Project>
