@@ -1,0 +1,28 @@
+﻿@model MRTD.Core.Models.MemberViewModel;
+
+<div id="@string.Format("View-{0}", Model.ChatID)" style="width: 100%;">
+</div>
+
+<script type="text/javascript">
+    function createForm (memguid, chatid) {
+        var form = $(document.createElement("Form"));
+        form.append($("<input type=\"hidden\" name=\"MemberID\" value=\"" + memguid + "\" />"));
+        form.append($("<input type=\"hidden\" name=\"ChatID\" value=\"" + chatid + "\" />"));
+        return form;
+    }
+    function RetriveUnitChat(mguid, chat_id) {
+        $.ajax({
+            url: "/ModuleActivity/GetMessageChatByChatID",
+            type: "post",
+            contentType: 'application/x-www-form-urlencoded',
+            data: createForm(mguid, chat_id).serialize(),
+            success: function (data) {
+                $("#@string.Format("View-{0}", Model.ChatID)").html("");
+                $("#@string.Format("View-{0}", Model.ChatID)").html(data);
+            }
+        });
+    }
+    $(document).ready(function () {
+        setInterval(RetriveUnitChat('@Model.MUID', '@Model.ChatID'), 10000);
+    });
+</script>

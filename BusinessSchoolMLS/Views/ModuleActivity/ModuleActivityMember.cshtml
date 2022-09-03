@@ -231,13 +231,15 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-            var url = "/ModuleActivity/ExportDataToExcel?mid=20937C8E-C606-4516-9F5C-8A2EAB5BB4F0&&mod_id=14&maid=3";
+            var _moduleId = @module.ModuleID,
+                _activityId = @ActivityID;
             $("#tippUnitActivityTable-" + @module.ModuleID).DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     {
                         text: 'Export To Excel',
                         action: function () {
+                            var url = "/ModuleActivity/ExportDataToExcel?mid=@mguid&mod_id=" + _moduleId + "&maid=" + _activityId;
                             window.open(url);
                         }
                     }

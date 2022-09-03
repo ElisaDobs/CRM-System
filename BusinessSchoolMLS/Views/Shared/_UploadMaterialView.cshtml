@@ -1,0 +1,87 @@
+﻿@model MRTD.Core.Models.MemberViewModel;
+
+@using MRTD.Core.Models;
+@using MRTD.Core.Common;
+@using BusinessSchoolMLS.SchoolBusinessComponent;
+
+@{
+    LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
+    FacultyBusinessComponent facultyBusinessComponent = new FacultyBusinessComponent();
+    var lst_learing_materials = facultyBusinessComponent.GetUnitLearningMaterialByUnitID(Model.ModuleID);
+    bool IsStudentCheck = loginBusinessComponent.IsStudentCheckByMemberGuid(Model.MUID);
+    List<RequiredUploadedDocModel> requiredUploadedDocModels = null;
+    if (!IsStudentCheck)
+    {
+        requiredUploadedDocModels = facultyBusinessComponent.GetAllUnitUploadType();
+    }
+}
+@if (!IsStudentCheck)
+{
+    <form id="UnitMaterialUpload" enctype="multipart/form-data">
+        <input type="hidden" name="MemberID" id="MemberID" value="@Model.MUID" />
+        <input type="hidden" name="UnitID" id="search_value" value="@Model.ModuleID" />
+        <div style="display: inline-block; width: 100%;">
+            <div style="display: inline-block; width: 30%;">
+                <label for="UploadType">Upload type</label>
+                <br />
+                <select class="form-control" name="UploadType">
+                    <option value="0"></option>
+                    @foreach (var upload_tpye in requiredUploadedDocModels)
+                    {
+                        <option value="@upload_tpye.UploadID">@upload_tpye.UploadTypeName</option>
+                    }
+                </select>
+            </div>
+            <div style="display: inline-block; width: 30%;">
+                <label for="Upload">Upload Unit File</label>
+                <br />
+                <input type="file" name="Upload" id="Upload" class="form-control" />
+            </div>
+            <div style="display: inline-block; width: 30%;">
+                <label></label>
+                <br />
+                <button type="submit" value="Upload" class="btn btn-primary tipp-custom-button">
+                    <span class="glyphicon glyphicon-upload"></span> Upload
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<br />
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Unit Name</th>
+                <th>File Name</th>
+                <th>Material Type</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tippUnitLearningMaterialTable-@Model.ModuleID">
+            @foreach (var learning_material in lst_learing_materials)
+            {
+                <tr>
+                    <td>@learning_material.ModuleName</td>
+                    <td>@learning_material.UploadFileName</td>
+                    <td>@learning_material.UploadTypeName</td>
+                    <td>
+                        @if (IsStudentCheck)
+                        {
+                            <a href="@Url.Action("DownloadLearningMaterial", "SchoolFaculty", new { mid = Model.MUID, upid = learning_material.UploadID, file_name = learning_material.UploadFileName})" class="btn btn-primary tipp-custom-button">
+                                <span class="glyphicon glyphicon-download"></span> Download
+                            </a>
+                        }
+                        else
+                        {
+                            <button onclick="javascript: RemoveLearnigMaterial('@Model.MUID', @learning_material.ModuleID, @learning_material.UploadID)" class="btn btn-primary tipp-custom-button">
+                                <span class="glyphicon glyphicon-trash"></span> Delete
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

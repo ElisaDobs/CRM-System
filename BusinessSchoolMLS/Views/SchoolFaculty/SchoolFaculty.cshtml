@@ -85,9 +85,34 @@
         position: absolute;
         width: 75%;
     }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    a {
+        color: #ffffff;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
     thead > tr {
         color: #ffffff !important;
         background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
     }
 </style>
 <div class="tipp-top-heading">
@@ -111,7 +136,11 @@
                         <td>@faculty.FacultyID</td>
                         <td>@faculty.FacultyName</td>
                         <td>@faculty.FacultyDescription</td>
-                        <td align="center">@Html.ActionLink("Add Program", "FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = faculty.FacultyID })</td>
+                        <td align="center">
+                            <a href="@Url.Action("FacultyQualification", "SchoolFaculty", new { mid = mguid, fid = faculty.FacultyID })" class="btn btn-primary tipp-custom-grid-button">
+                                <span class="glyphicon glyphicon-plus"></span> Course
+                            </a>
+                        </td>
                     </tr>
                 }
             </tbody>

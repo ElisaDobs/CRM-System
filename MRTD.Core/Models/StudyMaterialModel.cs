@@ -7,14 +7,15 @@ namespace MRTD.Core.Models
 {
     public class StudyMaterialModel
     {
-         public int UploadID { get; set; }
+        public int UploadID { get; set; }
 
-         public string UploadFileName { get; set; }
+        public string UploadFileName { get; set; }
 
-         public int UploadTypeID { get; set; }
+        public int UploadTypeID { get; set; }
 
-         public string UploadTypeName { get; set; }
+        public string UploadTypeName { get; set; }
 
-         public string ModuleName { get; set; }
+        public string ModuleName { get; set; }
+        public int ModuleID { get; set; }
     }
 }

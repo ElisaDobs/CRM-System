@@ -8,8 +8,12 @@ using Newtonsoft.Json;
 using System.IO;
 using MRTD.Core.Models;
 using MRTD.Core.Common;
+using Microsoft.Extensions.Primitives;
+using iTextSharp.text.html.simpleparser;
+using iTextSharp.text.pdf;
 using BusinessSchoolMLS.SchoolBusinessComponent;
 using System.Text;
+using iTextSharp.text;
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BusinessSchoolMLS.Controllers
@@ -19,11 +23,18 @@ namespace BusinessSchoolMLS.Controllers
         private readonly FacultyBusinessComponent _facultyBusinessComponent;
         private readonly LoginBusinessComponent _loginBusinessComponent;
         private readonly NotificationBusinessComponent _notificationBusinessComponent;
+        private readonly ModuleActivityBusinessComponent _moduleActivityBusinessComponent;
+        private readonly ApplicationBusinessComponent _applicationBusinessComponent;
+        private readonly AdministratorBusinessComponent _administratorBusinessComponent;
+        
         public SchoolFacultyController()
         {
             _facultyBusinessComponent = new FacultyBusinessComponent();
             _loginBusinessComponent = new LoginBusinessComponent();
             _notificationBusinessComponent = new NotificationBusinessComponent();
+            _applicationBusinessComponent = new ApplicationBusinessComponent();
+            _moduleActivityBusinessComponent = new ModuleActivityBusinessComponent();
+            _administratorBusinessComponent = new AdministratorBusinessComponent();
         }
         // GET: /<controller>/
         public IActionResult Index()
@@ -323,22 +334,111 @@ namespace BusinessSchoolMLS.Controllers
             return JsonConvert.SerializeObject(all_studies);
         }
 
-        public async Task<IActionResult> UploadMaterialStudyUnit([FromForm]LearningMaterialUploadModel learningMaterialUploadModel)
+        public async Task<string> UploadMaterialStudyUnit([FromForm]LearningMaterialUploadModel learningMaterialUploadModel)
         {
-            using (var memoryStream = new MemoryStream())
+            dynamic lst_learing_materials = null;
+            try
             {
-                ApplicationBusinessComponent applicationBusinessComponent = new ApplicationBusinessComponent();
-                ApplicantRequiredDocument applicantRequiredDocument = new ApplicantRequiredDocument();
-                LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
-                await learningMaterialUploadModel.Upload.CopyToAsync(memoryStream);
-                applicantRequiredDocument.MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(learningMaterialUploadModel.MemberID);
-                applicantRequiredDocument.UploadDocument = memoryStream.ToArray();
-                applicantRequiredDocument.UploadTypeID = learningMaterialUploadModel.UploadType;
-                applicantRequiredDocument.UnitID = learningMaterialUploadModel.UnitID;
-                applicantRequiredDocument.UploadFileName = learningMaterialUploadModel.Upload.FileName;
-                applicationBusinessComponent.InsertApplicationUpload(applicantRequiredDocument);
+                using (var memoryStream = new MemoryStream())
+                {
+                    ApplicantRequiredDocument applicantRequiredDocument = new ApplicantRequiredDocument();
+                    await learningMaterialUploadModel.Upload.CopyToAsync(memoryStream);
+                    applicantRequiredDocument.MemberID = _loginBusinessComponent.GetMemberIDByMemberGuid(learningMaterialUploadModel.MemberID);
+                    applicantRequiredDocument.UploadDocument = memoryStream.ToArray();
+                    applicantRequiredDocument.UploadTypeID = learningMaterialUploadModel.UploadType;
+                    applicantRequiredDocument.UnitID = learningMaterialUploadModel.UnitID;
+                    applicantRequiredDocument.UploadFileName = learningMaterialUploadModel.Upload.FileName;
+                    _applicationBusinessComponent.InsertApplicationUpload(applicantRequiredDocument);
+                }
+                lst_learing_materials = _facultyBusinessComponent.GetUnitLearningMaterialByUnitID(learningMaterialUploadModel.UnitID);
             }
-            return RedirectToAction("Library", "SchoolFaculty", new { mid = learningMaterialUploadModel.MemberID, uid = learningMaterialUploadModel.UnitID });
+            catch(Exception exception)
+            {
+
+            }
+            return JsonConvert.SerializeObject(lst_learing_materials);
+        }
+
+        public string DeleteStudyLearningMaterial(string mid, int mod_id, int uid)
+        {
+            dynamic lst_learing_materials = null;
+            int member_id = 0;
+            try
+            {
+                member_id = _loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+                _facultyBusinessComponent.RemoveUnitLearingMaterial(member_id, uid);
+                lst_learing_materials = _facultyBusinessComponent.GetUnitLearningMaterialByUnitID(mod_id);
+                _notificationBusinessComponent.InsertWebPushNotification("info", "Tipp Learning Material", "Learning Material is successfully removed.", member_id);
+            }
+            catch(Exception exception)
+            {
+                _notificationBusinessComponent.InsertWebPushNotification("error", "Tipp Learning Material", "Learning Material is unsuccessfully removed.", member_id);
+            }
+            return JsonConvert.SerializeObject(lst_learing_materials);
+        }
+        [Obsolete]
+        public IActionResult DownloadProgramSchedule(string mid)
+        {
+            byte[] bytes = null;
+            string IdentityNo = string.Empty;
+            try
+            {
+                int MemberID = _loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+                var memberProfile = _loginBusinessComponent.GetMemberProfileByMemberId(mid);
+                IdentityNo = memberProfile.IDNo;
+                List<UnitProgramScheduleModel> unitProgramScheduleModels = _moduleActivityBusinessComponent.GetModuleActivityResultsByMember(MemberID, DateTime.Now.Year);
+                var template = _administratorBusinessComponent.GetTemplateByTempleteID((int)ApplicationProgressStatus.PROGRAM_SCHEDULE);
+                string templateText = template.TemplateText,
+                       theader = "<br /><table><thead><tr bgcolor=\"#377091\" color=\"#ffffff\"><th>Unit Name</th><th>Credit</th><th>Year</th>";
+                templateText = templateText.Replace("#STUDENTADDRESS#", "ID No. " + memberProfile.IDNo + "<br />" 
+                                                   + "Name. " + memberProfile.FirstName + " " + memberProfile.LastName 
+                                                   + "<br />" + memberProfile.PhysicalAddress.Replace(",", "<br />"));
+                UnitProgramScheduleModel max_activity_obj = unitProgramScheduleModels.FirstOrDefault();
+                foreach(var remainder_header in max_activity_obj.ModuleActivity)
+                {
+                    theader += $"<th>{remainder_header.Key}</th>";
+                }
+                theader += "</thead><tbody>";
+                foreach (var program_unit_schedule in unitProgramScheduleModels)
+                {
+                    theader += "<tr>";
+                    theader += $"<td>{program_unit_schedule.ModuleName}</td>";
+                    theader += $"<td>{program_unit_schedule.Credit}</td>";
+                    theader += $"<td>{program_unit_schedule.AcademicYear}</td>";
+                    foreach(var tbody in max_activity_obj.ModuleActivity)
+                    {
+                        var obj_key = program_unit_schedule.ModuleActivity.Where(pair => pair.Key == tbody.Key).Select(pair => pair);
+                        if (obj_key.Any())
+                        {
+                            theader += $"<td>{obj_key.FirstOrDefault().Value.ToString()}</td>";
+                        }
+                        else
+                        {
+                            theader += $"<td>----</td>";
+                        }
+                    }
+                    theader += "</tr>";
+                }
+                theader += "</tbody></table>";
+                templateText = templateText.Replace("#PROGRAMSCHEDULE#", theader);
+                StringReader sr = new StringReader(templateText);
+                Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 10f, 0f);
+                HTMLWorker htmlparser = new HTMLWorker(pdfDoc);
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    PdfWriter writer = PdfWriter.GetInstance(pdfDoc, memoryStream);
+                    pdfDoc.Open();
+                    htmlparser.Parse(sr);
+                    pdfDoc.Close();
+                    bytes = memoryStream.ToArray();
+                    memoryStream.Close();
+                }
+            }
+            catch(Exception exception)
+            {
+
+            }
+            return File(bytes, "application/pdf", string.Format("{0}.pdf", IdentityNo));
         }
 
         [HttpGet]

@@ -47,6 +47,7 @@ namespace BusinessSchoolMLS.Controllers
             {
                 LogMessageBusinessComponent.InsertLogMessage(Session.AppSession["ApplicationId"].ToString(), MessageNode.SYS_FORGOT_PASSWORD_ERROR, exception.ToString());
             }
+            Session.AppSession.Remove("ErrorMessage");
             Session.AppSession.Set("ErrorMessage", "Please provide the correct e-mail to retrive the password!");
             return RedirectToAction("ForgotPassword", "Login", new object { });
         }
@@ -63,6 +64,7 @@ namespace BusinessSchoolMLS.Controllers
                 }
                 else
                 {
+                    Session.AppSession.Remove("ErrorMessage");
                     Session.AppSession.Set("ErrorMessage", "Invalid username and password, please provide the corrent login details!");
                 }
             }

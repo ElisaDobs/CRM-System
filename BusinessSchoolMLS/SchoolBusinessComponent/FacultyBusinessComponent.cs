@@ -447,6 +447,25 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
             }
         }
 
+        public bool RemoveUnitLearingMaterial(int MemberID, int UploadID)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.ReturnType = DataReturnType.NonQuery;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter.Set("MemberID", MemberID);
+                model.ApplicationParameter.Set("UploadID", UploadID);
+                int Count = (int)CommonDataAccess.Process(model);
+                return Count > 0;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
+
         public List<StudyMaterialModel> GetUnitLearningMaterialByUnitID(int UnitID)
         {
             try

@@ -166,7 +166,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
             }
         }
 
-        public List<FinancialAccountModel> GetYearFinancialStatementByMemberID(int MemberID, int AcademicYear)
+        public List<FinancialAccountModel> GetYearFinancialStatementByMemberID(int MemberID, int QualificationID)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 model.ReturnType = DataReturnType.Fill;
                 model.CommandType = CommandType.StoredProcedure;
                 model.ApplicationParameter.Set("MemberID", MemberID);
-                model.ApplicationParameter.Set("AcademicYear", AcademicYear);
+                model.ApplicationParameter.Set("QualificationID", QualificationID);
 
                 return (List<FinancialAccountModel>)CommonDataAccess.Process<FinancialAccountModel>(model);
             }

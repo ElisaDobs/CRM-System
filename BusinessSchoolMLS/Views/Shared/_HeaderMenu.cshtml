@@ -74,6 +74,9 @@
     }
 
     .tipp-custom-logout-button {
+        top: 10px !important;
+        right: 20% !important;
+        position: fixed !important;
         width: 100px;
         color: #ffffff !important;
         background-color: #377091 !important;
@@ -90,8 +93,7 @@
                 var lst_all_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(super_menu.MenuID);
                 <li>
                     <a asp-area="" asp-controller="#" asp-action="#" class="dropdown-toggle" data-toggle="dropdown" style="color: #377091;">@super_menu.MenuName</a>
-                    <span class="caret" style="color: #377091;"></span>
-
+                    @*<span class="caret" style="color: #377091;"></span>*@
                     @if (super_menu.MenuID == 2)
                     {
                         var lst_all_colleges = facultyBusinessComponent.GetAllBusinessFaculty(Session.AppSession["ClientId"].ToString());
@@ -183,10 +185,10 @@
             }
         </ul>
     }
-    <!--<div >
-        <button type="button" class="btn btn-primary tipp-custom-logout-button">
-            @Html.ActionLink("Log out", "LogOut", "Login", new { mid = mid }, new { @class = "glyphicon glyphicon-log-out tipp-redirect-link" })
-        </button>
-    </div>-->
+    <div>
+        <a href="@Url.Action("LogOut", "Login", new { mid = mid })" class="btn btn-primary tipp-custom-logout-button">
+            <span class="glyphicon glyphicon-log-out tipp-redirect-link"></span> Log out
+        </a>
+    </div>
 }
 

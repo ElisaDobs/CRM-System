@@ -125,6 +125,7 @@
                     <th>Chat Status</th>
                     <th></th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -168,6 +169,11 @@
                             }
                         </td>
                         <td align="center">
+                            <button type="button" class="btn btn-primary btn-sm tipp-custom-button" data-toggle="modal" data-target="#@string.Format("Chats-{0}", active_chat.ChatID)">
+                                <span class="glyphicon glyphicon-list"></span> View Chats
+                            </button>
+                        </td>
+                        <td align="center">
                             <button type="button" class="btn btn-primary btn-sm tipp-custom-button" data-toggle="modal" data-target="#@active_chat.ChatID">
                                 <span class="glyphicon glyphicon-list"></span> Manage Chats
                             </button>
@@ -181,6 +187,23 @@
 
 @foreach (var active_chat in lst_active_chat)
 {
+    <div id="@string.Format("Chats-{0}", active_chat.ChatID)" class="modal fade">
+        <div class="modal-dialog" style="width: 800px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title tipp-header">Chats - @active_chat.ChatName</h4>
+                </div>
+                <div class="modal-body">
+                   @Html.Partial("_UnitChatView", new MemberViewModel { MUID = Session.AppSession["MemberID"].ToString(), ChatID = active_chat.ChatID })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@foreach (var active_chat in lst_active_chat)
+{
     <div id="@active_chat.ChatID" class="modal fade">
         <div class="modal-dialog" style="width: 800px !important;">
             <div class="modal-content">
@@ -189,7 +212,7 @@
                     <h4 class="modal-title tipp-header">Manage Chat - @active_chat.ChatName</h4>
                 </div>
                 <div class="modal-body">
-                    @Html.Partial("_ManageUnitChat", new MemberViewModel { MUID = Session.AppSession["MemberID"].ToString(), ChatID = active_chat.ChatID });
+                    @Html.Partial("_ManageUnitChat", new MemberViewModel { MUID = Session.AppSession["MemberID"].ToString(), ChatID = active_chat.ChatID })
                 </div>
             </div>
         </div>

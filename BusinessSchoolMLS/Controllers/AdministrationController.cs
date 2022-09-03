@@ -11,7 +11,11 @@ using MRTD.Core.Encryption;
 using MRTD.Core.Upload;
 using BusinessSchoolMLS.SchoolBusinessComponent;
 using Microsoft.Extensions.Primitives;
-
+using iTextSharp.text.html.simpleparser;
+using iTextSharp.text.pdf;
+using System.Configuration;
+using System.IO;
+using iTextSharp.text;
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BusinessSchoolMLS.Controllers
@@ -19,11 +23,13 @@ namespace BusinessSchoolMLS.Controllers
     public class AdministrationController : Controller
     {
         private readonly ApplicationBusinessComponent applicationBusinessComponent;
+        private readonly AdministratorBusinessComponent administratorBusinessComponent;
         private readonly LoginBusinessComponent loginBusinessComponent;
         private readonly  NotificationBusinessComponent notificationBusiness;
         public AdministrationController()
         {
             applicationBusinessComponent = new ApplicationBusinessComponent();
+            administratorBusinessComponent = new AdministratorBusinessComponent();
             loginBusinessComponent = new LoginBusinessComponent();
             notificationBusiness  = new NotificationBusinessComponent();
         }
@@ -382,6 +388,69 @@ namespace BusinessSchoolMLS.Controllers
             lst_all_modules = facultyBusinessComponent.GetModuleByMemberIdAndLevel(MemberID, lid);
 
             return JsonConvert.SerializeObject(lst_all_modules);
+        }
+
+        [Obsolete]
+        public IActionResult DownLoadFinanceStatement(string mid, int qid)
+        {
+            string templateText = string.Empty,
+                   IdentityNo = string.Empty;
+            byte[] bytes = null;
+            try
+            {
+                int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(mid);
+                IdentityNo = loginBusinessComponent.GetMemberProfileByMemberId(mid).IDNo;
+                templateText = administratorBusinessComponent.GetStudentFincialStatementByMemberID(MemberID, qid, (int)ApplicationProgressStatus.FINANCIAL_STATEMENT);
+                var all_academic_finances = applicationBusinessComponent.GetYearFinancialStatementByMemberID(MemberID, qid);
+                string statements = "";
+                string statement_totals = "<tr><td colspan=\"4\" align=\"right\"><b>Credit</b></td>";
+                foreach (var finance in all_academic_finances)
+               {
+                    statements += "<tr>";
+                    statements += "<td>" + finance.FinancialDate.ToString("yyyy-MM-dd") + "</td>";
+                    statements += "<td>" + finance.ReferenceNo + "</td>";
+                    statements += "<td>" + finance.Allocation + "</td>";
+                    statements += "<td>" + finance.Description + "</td>";
+                    statements += "<td>" + string.Format("R{0:#.00}", finance.Debit) + "</td>";
+                    statements += "<td>" + finance.Credit + "</td>";
+                    statements += "<td>" + string.Format("R{0:#.00}", finance.Balance) + "</td>";
+                    statements += "</tr>";
+                }
+                templateText = templateText.Replace("#FINANCESTATEMENT#", statements);
+                statement_totals += "<td>" + string.Format("R{0:#.00}", all_academic_finances.Sum(a => a.Credit)) + "</td>";
+                statement_totals += "<td><b>Balance</b></td>;";
+                statement_totals += "<td>" + string.Format("R{0:#.00}", all_academic_finances.Sum(a => a.Balance)) + "</td>";
+                templateText = templateText.Replace("#DETAILS#", statement_totals);
+
+                StringReader sr = new StringReader(templateText);
+                Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 10f, 0f);
+                HTMLWorker htmlparser = new HTMLWorker(pdfDoc);
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    PdfWriter writer = PdfWriter.GetInstance(pdfDoc, memoryStream);
+                    pdfDoc.Open();
+                    htmlparser.Parse(sr);
+                    pdfDoc.Close();
+                    bytes = memoryStream.ToArray();
+                    memoryStream.Close();
+                }
+            }
+            catch(Exception exception)
+            {
+
+            }
+            return File(bytes, "application/pdf", string.Format("Statement-{0}.pdf", IdentityNo));
+        }
+
+        public IActionResult FinancialAccountStudent(string mid, int pid)
+        {
+            if(!string.IsNullOrEmpty(mid))
+            {
+                Session.AppSession.Remove("ProgramID");
+                Session.AppSession.Add("ProgramID", pid);
+            }
+
+            return View();
         }
     }
 }

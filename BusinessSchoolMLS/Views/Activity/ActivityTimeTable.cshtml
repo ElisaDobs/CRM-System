@@ -5,67 +5,175 @@
     ViewData["Title"] = "Activity TimeTable";
     var mguid = ViewBag.MemGuid;
     string activity_name = string.Empty;
-    activity_name = ViewBag.ActivityID == 1 ? "Assignment TimeTable" : ViewBag.ActivityID == 2 ? "Test TimeTable" : "Exam TimeTable";
+    activity_name = ViewBag.ActivityID == 1 ? "Assignment time table" : ViewBag.ActivityID == 2 ? "Test time table" : "Exam time table";
 
     LoginBusinessComponent loginBusinessComponent = new LoginBusinessComponent();
     OnlineModuleActivityBusinessComponent onlineModuleActivityBusinessComponent = new OnlineModuleActivityBusinessComponent();
     int MemberID = loginBusinessComponent.GetMemberIDByMemberGuid(mguid);
     List<ActivityTimeTableModel> all_activity_time_tables = onlineModuleActivityBusinessComponent.GetActivityTimeTableByMemberID(MemberID, ViewBag.ActivityID);
 }
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
 
-<dv>
-    &nbsp;
-</dv>
-<div>
-    <h2 style="color: #6d2829;">@activity_name</h2>
-</div>
+    .tipp-label {
+        color: #377091;
+    }
 
-<div>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Unit</th>
-                    <th>Academic Year</th>
-                    <th>Due Date</th>
-                    <th>Time</th>
-                    <th>Duration</th>
-                    <th>Pass Mark</th>
-                    <th>Total Mark</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var activity in all_activity_time_tables)
-                {
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+        width: 75%;
+    }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    a {
+        color: #ffffff;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+</style>
+
+
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">@activity_name</h4>
+    </div>
+    <div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@activity.Course</td>
-                        <td>@activity.AcademicYear</td>
-                        <td>@DateTime.Parse(activity.DueDate).ToString("yyyy-MM-dd")</td>
-                        <td>@activity.Time</td>
-                        <td>@activity.Duration</td>
-                        <td>@activity.PassMark</td>
-                        <td>@activity.TotalMark</td>
-                        @if (@activity.IsOnline)
-                        {
-                            <td>@Html.ActionLink("online", "OnlineQuestionnaire", "OnlineQuestionnaire", new { mid = ViewBag.MemGuid, aid = activity.ModuleActivityID })</td>
-                        }
-                        else
-                        {
-                            if (ViewBag.ActivityID == 1)
+                        <th>Unit</th>
+                        <th>Academic Year</th>
+                        <th>Due Date</th>
+                        <th>Time</th>
+                        <th>Duration</th>
+                        <th>Pass Mark</th>
+                        <th>Total Mark</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var activity in all_activity_time_tables)
+                    {
+                        <tr>
+                            <td>@activity.Course</td>
+                            <td>@activity.AcademicYear</td>
+                            <td>@DateTime.Parse(activity.DueDate).ToString("yyyy-MM-dd")</td>
+                            <td>@activity.Time</td>
+                            <td>@activity.Duration</td>
+                            <td>@activity.PassMark</td>
+                            <td>@activity.TotalMark</td>
+                            @if (@activity.IsOnline)
                             {
-
-                                <td>@Html.ActionLink("Upload", "ModuleActivitityUpload", "ModuleActivity", new { mid = ViewBag.MemGuid, maid = activity.ModuleActivityID })</td>
+                                <td>@Html.ActionLink("online", "OnlineQuestionnaire", "OnlineQuestionnaire", new { mid = ViewBag.MemGuid, aid = activity.ModuleActivityID })</td>
                             }
                             else
                             {
-                                <td></td>
+                                if (ViewBag.ActivityID == 1)
+                                {
 
+                                    <td>@Html.ActionLink("Upload", "ModuleActivitityUpload", "ModuleActivity", new { mid = ViewBag.MemGuid, maid = activity.ModuleActivityID })</td>
+                                }
+                                else
+                                {
+                                    <td></td>
+
+                                }
                             }
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+

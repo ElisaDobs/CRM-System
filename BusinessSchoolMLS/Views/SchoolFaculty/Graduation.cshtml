@@ -83,49 +83,84 @@
     .tipp-top-heading {
         top: 80px;
         position: absolute;
+        width: 75%;
+    }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091 !important;
     }
 </style>
 <div class="tipp-top-heading">
     <div>
-        <h4 class="tipp-header">Graduations</h4>
+        <h4 class="tipp-header">Program Graduations</h4>
     </div>
-    <div class="form-group">
-        <label for="drpQualification" class="tipp-label">Tipp Academy Qualification</label>
-        <select name="drpQualification" id="drpQualification" class="form-control tipp-input-field">
-            <option value="0"></option>
-            @foreach (FacultyQualModel faculty in models)
-            {
-                <option value="@faculty.QualificationID">@faculty.QualificationName</option>
-            }
-        </select>
+    <div style="display: inline-block; width: 100%;">
+        <div style="display: inline-block; width: 40%;">
+            <label for="drpQualification" class="tipp-label">Tipp Academy Qualification</label>
+            <br />
+            <select name="drpQualification" id="drpQualification" class="form-control">
+                <option value="0"></option>
+                @foreach (FacultyQualModel faculty in models)
+                {
+                    <option value="@faculty.QualificationID">@faculty.QualificationName</option>
+                }
+            </select>
+        </div>
+        <div style="display: inline-block; width: 40%;">
+            <label></label>
+            <br />
+            <button type="button" class="btn btn-primary tipp-custom-button" id="viewlist">
+                <span class="glyphicon glyphicon-list"></span> View List
+            </button>
+        </div>
     </div>
-    <div class="form-group">
-        <input type="button" class="btn btn-default tipp-btn-default" id="viewlist" value="View List" />
-    </div>
-    <div class="table-responsive" style="display: none;">
-        <table class="table">
+    <div><br /></div>
+    <div id="tippStudentProgramGraduation" style="display: none; ">
+        <table id="tippProgramGraduation" class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <td>FullName</td>
-                    <td>IDNo</td>
-                    <td>Cell No</td>
-                    <td>Program Name</td>
-                    <td>Program Code</td>
-                    <td>Date Completed</td>
+                    <th>Full Name</th>
+                    <th>Identity No</th>
+                    <th>Cell No</th>
+                    <th>Program Name</th>
+                    <th>Program Code</th>
+                    <th>Date Completed</th>
                 </tr>
             </thead>
             <tbody id="graduation"></tbody>
         </table>
     </div>
 </div>
-<script type="text/javascript" src="~/js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript">
 
     $(document).ready(function () {
+        
         $("#viewlist").bind("click", function () {
             $.get("/SchoolFaculty/GetAllMemberDueForGraduationQualificationID?qid=" + $("#drpQualification").find("option:selected").val(), function (data) {
                 $("#graduation").html(data);
-                $(".table-responsive").show();
+                $("#tippStudentProgramGraduation").show();
+                $("#tippProgramGraduation").DataTable({});
             });
         });
     });

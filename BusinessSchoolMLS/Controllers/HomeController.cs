@@ -16,6 +16,7 @@ namespace BusinessSchoolMLS.Controllers
         {
             if (!string.IsNullOrEmpty(mid))
             {
+                Session.AppSession.Remove("MemberID");
                 Session.AppSession.Set("MemberID", mid);
                 ViewBag.AcademicYear = DateTime.Now.Year;
                 return View();

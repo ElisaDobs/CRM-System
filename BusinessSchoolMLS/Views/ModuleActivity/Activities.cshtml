@@ -1,5 +1,5 @@
 ﻿@model MRTD.Core.Models.ModuleActivityModel;
-@using MRTD.Core.Common; 
+@using MRTD.Core.Common;
 
 @{
     ViewData["Title"] = "Module Activity";
@@ -122,13 +122,16 @@
     a {
         color: #ffffff;
     }
+
     label {
         color: #377091 !important;
     }
+
     thead > tr {
         color: #ffffff !important;
         background-color: #377091 !important;
     }
+
     .tipp-redirect-link {
         color: #377091;
     }
@@ -170,11 +173,17 @@
                         </td>
                         @if (module_act.IsOline)
                         {
-                            <td>@Html.ActionLink("Add Questions", "ModuleActivityQuestion", "OnlineQuestionnaire", new { mid = mguid, maid = module_act.ModuleActivityID })</td>
+                            <td align="center">
+                                <a class="btn btn-primary btn-sm tipp-custom-button" href="@Url.Action("ModuleActivityQuestion", "OnlineQuestionnaire", new { mid = mguid, maid = module_act.ModuleActivityID })">
+                                    <span class="glyphicon glyphicon-plus"></span> Questionnaire
+                                </a>
+                            </td>
                         }
                         else
                         {
-                            <td></td>
+                            <td align="center">
+                                @string.Format("{0}", "---")
+                            </td>
                         }
                     </tr>
                 }
@@ -199,7 +208,7 @@
                         <input type="hidden" name="FacultyID" value="@fac_id" />
                         <input type="hidden" name="ModuleActivityID" value="@activity.ModuleActivityID" />
                         <div class="form-group">
-                            <label for="ActivityID" class="tipp-label">Activity Type</label>
+                            @Html.LabelFor(model => model.ActivityID)
                             <select name="ActivityID" class="form-control" validation="select">
                                 @foreach (var act in Model.ActivitList)
                                 {
@@ -215,7 +224,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="ModuleID" class="tipp-label">Program Unit</label>
+                            @Html.LabelFor(model => model.ModuleID)
                             <select name="ModuleID" class="form-control" validation="select">
                                 @foreach (var module in Model.ModuleList)
                                 {
@@ -231,27 +240,27 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="ModuleID" class="tipp-label">Date</label>
+                            @Html.LabelFor(model => model.ActivityDate)
                             <input type="date" name="ActivityDate" class="form-control" validation="required" value="@activity.ActivityDate.ToString("yyyy-MM-dd")" />
                         </div>
                         <div class="form-group" id="div-activity-time">
-                            <label for="ActivityTime" class="tipp-label">Time</label>
+                            @Html.LabelFor(model => model.ActivityTime)
                             <input type="time" name="ActivityTime" class="form-control" validation="required" value="@activity.ActivityTime" />
                         </div>
                         <div class="form-group" id="div-activity-duration">
-                            <label for="ActivityDuration" class="tipp-label">Duration</label>
+                            @Html.LabelFor(model => model.ActivityDuration)
                             <input type="number" name="ActivityDuration" class="form-control" validation="required" value="@activity.ActivityDuration" />
                         </div>
                         <div class="form-group">
-                            <label for="ActivityPassMark" class="tipp-label">Pass Mark</label>
+                            @Html.LabelFor(model => model.ActivityPassMark)
                             <input type="number" name="ActivityPassMark" class="form-control" validation="required" value="@activity.ActivityPassMark" />
                         </div>
                         <div class="form-group">
-                            <label for="ActivityTotalMark" class="tipp-label">Total Mark</label>
+                            @Html.LabelFor(model => model.ActivityTotalMark)
                             <input type="number" name="ActivityTotalMark" class="form-control" validation="required" value="@activity.ActivityTotalMark" />
                         </div>
                         <div class="form-group">
-                            <label for="AssessorID" class="tipp-label">Assessor</label>
+                            @Html.LabelFor(model => model.AssessorID)
                             <select name="AssessorID" class="form-control" validation="select">
                                 @foreach (var assessor in Model.ActivityAssessors)
                                 {
@@ -285,7 +294,7 @@
                 <h4 class="modal-title tipp-header">Create Activity</h4>
             </div>
             <div class="modal-body">
-                @using (Html.BeginForm("AddModuleActivity", "ModuleActivity", FormMethod.Post, new { id="CreateActivityForm" }))
+                @using (Html.BeginForm("AddModuleActivity", "ModuleActivity", FormMethod.Post, new { id = "CreateActivityForm" }))
                 {
                     <input type="hidden" name="MemberID" value="@mguid" />
                     <input type="hidden" name="QualificationID" value="@qual_id" />
@@ -566,7 +575,7 @@
         $("button.dt-button").attr("data-toggle", "modal");
         $("button.dt-button").attr("data-target", "#CreatePrograomUnitActivityForm");
         $("button.dt-button").addClass("tipp-custom-button");
-       
+
         var form = $(document.getElementsById("CreateActivityForm"));
         form.submit(function (e) {
             var validate_form = new Form(form);

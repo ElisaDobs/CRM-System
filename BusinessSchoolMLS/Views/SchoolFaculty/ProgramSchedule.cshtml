@@ -24,14 +24,126 @@
         }
     }
 }
-<div>
-    &nbsp;
-</div>
-<h4>Program Schedule</h4>
+<style type="text/css">
+    .tipp-header {
+        color: #6d2829;
+    }
 
-<div>
-    <div class="table-responsive">
-        <table class="table">
+    .tipp-label {
+        color: #377091;
+    }
+
+    .tipp-input-field {
+        width: 85%;
+    }
+
+    .tipp-container {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .tipp-left-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-middle-align {
+        width: 60%;
+        display: inline-block;
+    }
+
+    .tipp-right-align {
+        width: 15%;
+        display: inline-block;
+    }
+
+    .tipp-error-message {
+        color: red;
+        width: 100%;
+        text-align: left;
+        display: none;
+    }
+
+    .tipp-btn-default {
+        width: 120px;
+        color: #6d2829;
+    }
+
+    .tipp-btn-container {
+        width: 100%;
+        left: 5%;
+        position: relative;
+        text-align: center;
+    }
+
+    .tipp-redirect-link {
+        color: #377091;
+    }
+
+    a {
+        color: #377091;
+    }
+
+    .tipp-logo {
+        padding-top: 0px;
+        top: 5px;
+        position: absolute;
+    }
+
+    .tipp-logo-botton-line {
+        background-color: #377091;
+        width: 100%;
+        height: 10px
+    }
+
+    .tipp-top-heading {
+        top: 80px;
+        position: absolute;
+        width: 75%;
+    }
+
+    .tipp-custom-button {
+        width: 140px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-extend-button {
+        width: 160px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-custom-grid-button {
+        width: 100px;
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    label {
+        color: #377091 !important;
+    }
+
+    thead > tr {
+        color: #ffffff !important;
+        background-color: #377091 !important;
+    }
+
+    .tipp-redirect-link {
+        color: #377091 !important;
+    }
+</style>
+<div class="tipp-top-heading">
+    <div>
+        <h4 class="tipp-header">Program Schedule</h4>
+    </div>
+    <div>
+        <a href="@Url.Action("DownloadProgramSchedule", "SchoolFaculty", new { mid = ViewBag.MemGuid})" class="dt-button tipp-custom-button">
+            <span class="glyphicon glyphicon-download"></span> Download
+        </a>
+    </div>
+    <div>
+        <table id="tippProgramScheduleTable" class="table">
             <thead>
                 <tr>
                     <th>Unit ID</th>
@@ -82,3 +194,23 @@
         </table>
     </div>
 </div>
+<script type="text/javascript">
+    function DownLoadProgramSchedule(mguid) {
+        alert();
+        $.ajax({
+            url: "/SchoolFaculty/DownloadProgramSchedule?mid=" + mguid,
+            type: "post",
+            data: {},
+            success: function (data) {
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    $(document).ready(function () {
+        $("#tippProgramScheduleTable").DataTable({
+            dom: 'Bfrtip'
+        });
+    });
+</script>

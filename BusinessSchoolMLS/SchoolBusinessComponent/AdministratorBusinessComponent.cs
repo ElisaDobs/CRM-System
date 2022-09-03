@@ -15,6 +15,25 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
         {
         }
 
+        public string GetStudentFincialStatementByMemberID(int MemberID, int QualificationID, int TemplateID)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.ReturnType = DataReturnType.Scalar;
+                model.CommandType = CommandType.StoredProcedure;
+                model.ApplicationParameter.Set("MemberID", MemberID);
+                model.ApplicationParameter.Set("QualificationID", QualificationID);
+                model.ApplicationParameter.Set("TemplateID", TemplateID);
+
+                return (string)CommonDataAccess.Process(model);
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
         public List<MenuModel> GetMenuListByNemberID(int MemberID)
         {
             try

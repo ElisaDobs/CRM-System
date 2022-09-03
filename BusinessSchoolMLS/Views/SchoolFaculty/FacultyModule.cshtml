@@ -128,10 +128,9 @@
                 <tr>
                     <th>Unit ID</th>
                     <th>Name</th>
-                    <th>Program</th>
+                    <th>Course</th>
                     <th>NQF Level</th>
                     <th>Credits</th>
-                    <th>Level</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -145,14 +144,15 @@
                         <td>@fac_qual.QualificationName</td>
                         <td>@qual_module.NQLevelID</td>
                         <td>@qual_module.Credit</td>
-                        <td>@qual_module.AcademicLevelID</td>
                         <td>
-                            <button type="button" class="btn btn-default tipp-custom-grid-button" data-toggle="modal" data-target="#@qual_module.ModuleUnitCode">
+                            <button type="button" class="btn btn-primary tipp-custom-grid-button" data-toggle="modal" data-target="#@qual_module.ModuleUnitCode">
                                 <span class="glyphicon glyphicon-edit"></span> Edit
                             </button>
                         </td>
                         <td>
-                            @Html.ActionLink("Activity", "activities", "ModuleActivity", new { mid = mguid, modid = qual_module.ModuleID, qid = qual_id, fid = fac_id }, new { @class = "tipp-redirect-link" })
+                            <a href="@Url.Action("activities", "ModuleActivity", new { mid = mguid, modid = qual_module.ModuleID, qid = qual_id, fid = fac_id })" class="btn btn-primary tipp-custom-grid-button">
+                                <span class="glyphicon glyphicon-plus"></span> Activity
+                            </a>
                         </td>
                     </tr>
                 }

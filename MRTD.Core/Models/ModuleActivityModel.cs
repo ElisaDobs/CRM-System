@@ -11,7 +11,7 @@ namespace MRTD.Core.Models
     {
         public int ModuleActivityID { get; set; }
 
-        [Display(Name = "Module Name")]
+        [Display(Name = "Unit Standard Title")]
         public int ModuleID { get; set; }
 
         [Display(Name = "Activity Name")]
