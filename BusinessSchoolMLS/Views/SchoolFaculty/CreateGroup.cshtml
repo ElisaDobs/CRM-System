@@ -120,8 +120,10 @@
                 <tr>
                     <th>Unit Name</th>
                     <th>Group Name</th>
-                    <th>Attendance Date</th>
-                    <th>Attendance Time</th>
+                    <th>Attendance Start Date</th>
+                    <th>Attendance End Date </th>
+                    <th>Attendance Start Time</th>
+                    <th>Attendance End Time</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -129,20 +131,22 @@
             <tbody>
                 @foreach (var qual_module in all_groups)
                 {
-                    <tr>
-                        <td>@qual_module.ModuleName</td>
-                        <td>@qual_module.GroupName</td>
-                        <td>@qual_module.AttDate.ToString("yyyy - MM - dd")</td>
-                        <td>@qual_module.AttTime</td>
-                        <td align="center">
-                            <button type="button" class="btn btn-primary btn-sm tipp-custom-grid-button" data-toggle="modal" data-target="#@qual_module.GroupID">
-                                <span class="glyphicon glyphicon-edit"></span> Edit
-                            </button>
-                        </td>
-                        <td align="center">
-                            <a class="btn btn-primary btn-sm tipp-custom-grid-button" href="@Url.Action("GroupAttendants", "SchoolFaculty", new { mid = mguid, gid = qual_module.GroupID })"><span class="glyphicon glyphicon-list"> View</span></a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>@qual_module.ModuleName</td>
+                    <td>@qual_module.GroupName</td>
+                    <td>@qual_module.AttDate.ToString("yyyy - MM - dd")</td>
+                    <td>@qual_module.AttEndDate.ToString("yyyy - MM - dd")</td>
+                    <td>@qual_module.AttTime</td>
+                    <td>@qual_module.AttEndTime</td>
+                    <td align="center">
+                        <button type="button" class="btn btn-primary btn-sm tipp-custom-grid-button" data-toggle="modal" data-target="#@qual_module.GroupID">
+                            <span class="glyphicon glyphicon-edit"></span> Edit
+                        </button>
+                    </td>
+                    <td align="center">
+                        <a class="btn btn-primary btn-sm tipp-custom-grid-button" href="@Url.Action("GroupAttendants", "SchoolFaculty", new { mid = mguid, gid = qual_module.GroupID })"><span class="glyphicon glyphicon-list"> View</span></a>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>
@@ -181,20 +185,28 @@
                     <input type="hidden" name="MemberID" value="@mguid" />
                     <div class="form-group">
                         @Html.LabelFor(model => model.GroupName, new { @class = "tipp-label" })
-                        @Html.TextBoxFor(model => Model.GroupName, new { @class = "form-control tipp-input-field", validation = "required" })
+                        @Html.TextBoxFor(model => Model.GroupName, new { @class = "form-control", validation = "required" })
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(model => model.ModuleID, new { @class = "tipp-label" })
-                        @Html.DropDownListFor(model => model.ModuleID, Model.ModuleList, new { @class = "form-control tipp-input-field", validation = "select" })
+                        @Html.DropDownListFor(model => model.ModuleID, Model.ModuleList, new { @class = "form-control ", validation = "select" })
                     </div>
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.AttDate, new { @class = "tipp-label" })
-                        @Html.TextBoxFor(model => Model.AttDate, new { @class = "form-control tipp-input-field", @type = "date", validation = "date" })
+                        @Html.TextBoxFor(model => Model.AttDate, new { @class = "form-control", @type = "date", validation = "date" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AttEndDate, new { @class = "tipp-label" })
+                        @Html.TextBoxFor(model => Model.AttEndDate, new { @class = "form-control", @type = "date", validation = "date" })
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(model => model.AttTime, new { @class = "tipp-label" })
-                        @Html.TextBoxFor(model => Model.AttTime, new { @class = "form-control tipp-input-field", @type = "time", validation = "time" })
+                        @Html.TextBoxFor(model => Model.AttTime, new { @class = "form-control", @type = "time", validation = "time" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AttEndTime, new { @class = "tipp-label" })
+                        @Html.TextBoxFor(model => Model.AttEndTime, new { @class = "form-control", @type = "time", validation = "time" })
                     </div>
                     <div class="form-group">
                     </div>

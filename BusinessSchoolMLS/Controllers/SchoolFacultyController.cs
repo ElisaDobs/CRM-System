@@ -47,8 +47,14 @@ namespace BusinessSchoolMLS.Controllers
             if (!string.IsNullOrEmpty(mid))
             {
                 ViewBag.MemGuid = mid;
-
-                return View();
+                if (Session.AppSession["ClientId"].ToString().ToUpper() != "FD49002B-C33F-4615-9E2C-D49E11AF4394")
+                {
+                    return View();
+                }
+                else
+                {
+                    return RedirectToAction("FacultyQualification", "SchoolFaculty", new { mid= mid, fid = 8});
+                }
             }
             else
             {

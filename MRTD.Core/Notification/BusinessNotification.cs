@@ -46,6 +46,7 @@ namespace MRTD.Core.Notification
                     }
                     else
                     {
+                        smtp.Timeout = 120000;
                         smtp.Send(message);
                     }
                 }

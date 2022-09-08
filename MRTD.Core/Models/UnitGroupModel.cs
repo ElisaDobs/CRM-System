@@ -15,12 +15,14 @@ namespace MRTD.Core.Models
         [Display(Name = "Unit Name")]
         public int ModuleID { get; set; }
 
-        [Display(Name = "Attendance Date")]
+        [Display(Name = "Attendance Start Date")]
         public DateTime AttDate { get; set; }
-
-        [Display(Name = "Attendance Time")]
+        [Display(Name = "Attendance End Date")]
+        public DateTime AttEndDate { get; set; }
+        [Display(Name = "Attendance Start Time")]
         public DateTime AttTime { get; set; }
-
+        [Display(Name = "Attendance End Time")]
+        public DateTime AttEndTime { get; set; }
         public string MemberID { get; set; }
 
         public SelectList ModuleList;

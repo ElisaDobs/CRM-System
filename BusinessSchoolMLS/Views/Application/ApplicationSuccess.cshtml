@@ -22,20 +22,8 @@
         <!--<link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />-->
     </environment>
     <style type="text/css">
-        .tipp-banner {
-            left: 25%;
-            position: relative;
-            top: -20px;
-            width: 60%;
-        }
-
         .tipp-header {
             color: #6d2829;
-        }
-
-        .tipp-progressbar {
-            left: 25%;
-            position: relative;
         }
 
         .tipp-label {
@@ -80,9 +68,9 @@
 
         .tipp-btn-container {
             width: 100%;
-            left: 10%;
+            left: 5%;
             position: relative;
-            text-align: left;
+            text-align: center;
         }
 
         .tipp-redirect-link {
@@ -93,34 +81,57 @@
             color: #377091;
         }
 
+        .tipp-logo {
+            padding-top: 0px;
+            top: 5px;
+            position: absolute;
+        }
+
         .tipp-logo-botton-line {
             background-color: #377091;
             width: 100%;
             height: 10px
         }
 
-        .tipp-logo {
-            padding-top: 0px;
-            top: 5px;
+        .tipp-top-heading {
+            top: 80px;
             position: absolute;
+            width: 75%;
+        }
+
+        .tipp-custom-button {
+            width: 140px;
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+
+        .tipp-custom-grid-button {
+            width: 100px;
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+
+        label {
+            color: #377091 !important;
+        }
+
+        thead > tr {
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+
+        .tipp-redirect-link {
+            color: #377091 !important;
         }
     </style>
 </head>
 <body>
-    <div class="tipp-banner">
-        <img src="~/tipp-academy-logo.png" width="160" height="45" />
-        <div style="background-color: #377091; width: 100%; height: 10px">
-            &nbsp;
+    <div class="tipp-top-heading">
+        <div>
+            <h4 class="tipp-header">Application Successfull</h4>
         </div>
-    </div>
-    <div class="container">
-        <div class="tipp-btn-container">
-            <div class="tipp-middle-align">
-                <h4 class="tipp-header">Application Successfull</h4>
-            </div>
-            <div>
-                <p>You have successfull completed registration form. We will comeback to after your documents has been verified.</p>
-            </div>
+        <div>
+            <p>You have successfull completed registration form. We will comeback to after your documents has been verified.</p>
         </div>
     </div>
 </body>

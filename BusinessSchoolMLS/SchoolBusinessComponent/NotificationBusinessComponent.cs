@@ -80,5 +80,25 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 throw exception;
             }
         }
+
+        public NotificationModel GetNotificationByMemberId(int TemplateId, Guid MemberId, string ApplicationId)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.CommandType = CommandType.StoredProcedure;
+                model.ReturnType = DataReturnType.Fill;
+                model.ApplicationParameter.Add("MemberId", MemberId);
+                model.ApplicationParameter.Add("TemplateID", TemplateId);
+                model.ApplicationParameter.Add("ApplicationId", Guid.Parse(ApplicationId));
+                var lstNotificationModel = (List<NotificationModel>)CommonDataAccess.Process<NotificationModel>(model);
+                return lstNotificationModel.FirstOrDefault();
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
     }
 }

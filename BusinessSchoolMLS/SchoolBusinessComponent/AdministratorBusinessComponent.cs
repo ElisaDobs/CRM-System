@@ -102,5 +102,23 @@ namespace BusinessSchoolMLS.SchoolBusinessComponent
                 throw exception;
             }
         }
+
+        public byte[] GetRequiredDocumentByUploadID(int UploadID)
+        {
+            try
+            {
+                ApplicationFunctionalityModel model = (ApplicationFunctionalityModel)Session.AppFunctionality[MethodBase.GetCurrentMethod().Name];
+                model.ApplicationParameter = new ApplicationSession();
+                model.CommandType = CommandType.StoredProcedure;
+                model.ReturnType = DataReturnType.Scalar;
+                model.ApplicationParameter.Set("UploadID", UploadID);
+                byte[] document = (byte[])CommonDataAccess.Process(model);
+                return document;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
     }
 }

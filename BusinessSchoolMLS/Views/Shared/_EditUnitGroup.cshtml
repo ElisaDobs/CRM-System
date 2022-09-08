@@ -25,12 +25,20 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="AttDate">Attendence Date</label>
+        <label for="AttDate">Attendence start Date</label>
         <input type="date" name="AttDate" value="@Model.Group.AttDate.ToString("yyyy-MM-dd")" class="form-control" validation="date" />
     </div>
     <div class="form-group">
-        <label for="AttTime">Attendence Time</label>
+        <label for="AttDate">Attendence End Date</label>
+        <input type="date" name="AttDate" value="@Model.Group.AttEndDate.ToString("yyyy-MM-dd")" class="form-control" validation="date" />
+    </div>
+    <div class="form-group">
+        <label for="AttTime">Attendence Start Time</label>
         <input type="time" name="AttTime" value="@TimeSpan.Parse(Model.Group.AttTime.ToString("HH:mm"))" class="form-control" validation="date" />
+    </div>
+    <div class="form-group">
+        <label for="AttTime">Attendence End Time</label>
+        <input type="time" name="AttEndTime" value="@TimeSpan.Parse(Model.Group.AttEndTime.ToString("HH:mm"))" class="form-control" validation="date" />
     </div>
     <div class="tipp-btn-container">
         <button type="submit" class="btn btn-primary tipp-custom-button" data-toggle="modal">Save</button>

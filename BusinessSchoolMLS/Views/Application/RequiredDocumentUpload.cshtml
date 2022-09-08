@@ -24,20 +24,8 @@
         <!--<link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />-->
     </environment>
     <style type="text/css">
-        .tipp-banner
-        {
-            left: 25%;
-            position: relative;
-            top: -20px;
-            width: 60%;
-        }
         .tipp-header {
             color: #6d2829;
-        }
-
-        .tipp-progressbar{
-            left: 25%;
-            position: relative;
         }
 
         .tipp-label {
@@ -82,9 +70,9 @@
 
         .tipp-btn-container {
             width: 100%;
-            left: 10%;
+            left: 5%;
             position: relative;
-            text-align: left;
+            text-align: center;
         }
 
         .tipp-redirect-link {
@@ -94,58 +82,81 @@
         a {
             color: #377091;
         }
-        .tipp-logo-botton-line
-        {
-            background-color: #377091; 
-            width: 100%; 
+
+        .tipp-logo {
+            padding-top: 0px;
+            top: 5px;
+            position: absolute;
+        }
+
+        .tipp-logo-botton-line {
+            background-color: #377091;
+            width: 100%;
             height: 10px
         }
-        .tipp-logo
-        {
-            padding-top: 0px;
-            top: 5px; 
+
+        .tipp-top-heading {
+            top: 80px;
             position: absolute;
+            width: 75%;
+        }
+
+        .tipp-custom-button {
+            width: 140px;
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+
+        .tipp-custom-grid-button {
+            width: 100px;
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+
+        label {
+            color: #377091 !important;
+        }
+
+        thead > tr {
+            color: #ffffff !important;
+            background-color: #377091 !important;
+        }
+
+        .tipp-redirect-link {
+            color: #377091 !important;
         }
     </style>
 </head>
 <body>
-    <div class="tipp-banner">
-        <img src="~/tipp-academy-logo.png" width="160" height="45" />
-        <div class="tipp-logo-botton-line">
-            &nbsp;
+    <div class="tipp-top-heading">
+        <div>
+            <h4 class="tipp-header">Required Documents Upload</h4>
         </div>
-    </div>
-    <div class="container">
-        <div class="tipp-btn-container">
-            <div class="tipp-middle-align">
-                <h4 class="tipp-header">Required Documents Upload</h4>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:40%;">
-                        2 of 5 steps
-                    </div>
+        <div>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:40%;">
+                    2 of 5 steps
                 </div>
-                <div>
-                    <p style="color: red;">
-                        *Please upload the scanned required document(s) or open the mail that will be sent to your provided e-mail and upload from there.
-                    </p>
-                </div>
-                @using (Html.BeginForm("SaveRequiredUpload", "Application", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            </div>
+            <div>
+                <p style="color: red;">
+                    *Please upload the scanned required document(s) or open the mail that will be sent to your provided e-mail and upload from there.
+                </p>
+            </div>
+            @using (Html.BeginForm("SaveRequiredUpload", "Application", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <input type="hidden" name="MemberID" value="@ViewBag.MemGuid" />
+                @foreach (var pre in lst_all_prer)
                 {
-                    <input type="hidden" name="MemberID" value="@ViewBag.MemGuid" />
-                    @foreach (var pre in lst_all_prer)
-                    {
-                        <div class="form-group">
-                            <label for="@pre.FileControlName" class="tipp-label">@pre.UploadTypeName</label>
-                            <input type="file" name="@pre.FileControlName" class="form-control tipp-input-field" />
-                        </div>
-                    }
                     <div class="form-group">
-                        <input type="submit" value="Upload" class="btn btn-default tipp-btn-default" />
+                        <label for="@pre.FileControlName" class="tipp-label">@pre.UploadTypeName</label>
+                        <input type="file" name="@pre.FileControlName" class="form-control" />
                     </div>
                 }
-            </div>
-            <div class="tipp-right-align">
-            </div>
+                <div class="form-group">
+                    <input type="submit" value="Upload" class="btn btn-primary tipp-custom-button" />
+                </div>
+            }
         </div>
     </div>
 </body>

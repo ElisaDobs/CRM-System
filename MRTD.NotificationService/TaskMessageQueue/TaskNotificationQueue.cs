@@ -15,6 +15,22 @@ namespace MRTD.NotificationService.TaskMessageQueue
 {
     public static class TaskNotificationQueue
     {
+        public static void SendMessageFromQueue(MemberActivityModel activityModel)
+        {
+            try
+            {
+                BusinessNotification.ProcessNotice(activityModel, Session.AppSession["MailServer"].ToString(),
+                                   Session.AppSession["Port"].ToString(),
+                                   Session.AppSession["FromUsername"].ToString(),
+                                   TippAcademyEncryptionEngine.Decrypt(Session.AppSession["FromPassword"].ToString(),
+                                   Session.AppSession["ApplicationId"].ToString()),
+                                   Session.AppSession["FromEmailHead"].ToString());
+            }
+            catch(Exception exception)
+            {
+                LoggerBusinessComponent.InsertLogMessage(Session.AppSession["ApplicationId"].ToString(), MessageNode.SYS_MRTD_NOTIFICATION_ERROR, exception.ToString());
+            }
+        }
         public static void SendMessage(string queueName, MemberActivityModel model)
         {
             try

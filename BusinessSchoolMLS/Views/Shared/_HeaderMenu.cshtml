@@ -91,10 +91,19 @@
             @foreach (var super_menu in lst_all_menus)
             {
                 var lst_all_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(super_menu.MenuID);
-                <li>
+            <li>
+                @if (super_menu.MenuName == "Programs")
+                {
+                    @*<a asp-area="" asp-controller="#" asp-action="#" class="dropdown-toggle" data-toggle="dropdown" style="color: #377091;">@super_menu.MenuName</a>*@
+                }
+                else
+                {
                     <a asp-area="" asp-controller="#" asp-action="#" class="dropdown-toggle" data-toggle="dropdown" style="color: #377091;">@super_menu.MenuName</a>
-                    @*<span class="caret" style="color: #377091;"></span>*@
-                    @if (super_menu.MenuID == 2)
+                }
+                @*<span class="caret" style="color: #377091;"></span>*@
+                @if (super_menu.MenuID == 2)
+                {
+                    if (Session.AppSession["ClientId"].ToString().ToUpper() != "FD49002B-C33F-4615-9E2C-D49E11AF4394")
                     {
                         var lst_all_colleges = facultyBusinessComponent.GetAllBusinessFaculty(Session.AppSession["ClientId"].ToString());
                         <ul class="dropdown-menu">
@@ -125,63 +134,64 @@
                             }
                         </ul>
                     }
-                    else
-                    {
-                        <ul class="dropdown-menu">
-                            @foreach (var menu in lst_all_sub_menus)
+                }
+                else
+                {
+                    <ul class="dropdown-menu">
+                        @foreach (var menu in lst_all_sub_menus)
+                        {
+                            if (menu.ActivityID != 0)
                             {
-                                if (menu.ActivityID != 0)
+                                if (menu.MenuID == 8)
                                 {
-                                    if (menu.MenuID == 8)
-                                    {
-                                        var lst_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(menu.MenuID);
-                                        <li class="dropdown-submenu">
-                                            <a tabindex="-1" href="#" style="color: #377091;">@menu.MenuName</a>
-                                            <ul class="dropdown-menu">
-                                                @foreach (var sub_menu in lst_sub_menus)
-                                                {
-                                                    <li style="color: #377091;">
-                                                        @Html.ActionLink(sub_menu.MenuName, sub_menu.ActionName, sub_menu.ControllerName, new { mid = mid, actid = sub_menu.ActivityID }, new { @style = "color: #377091;", @tabindex = "-1" })
-                                                    </li>
-                                                }
-                                            </ul>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li style="color: #377091;">
-                                            @Html.ActionLink(menu.MenuName, menu.ActionName, menu.ControllerName, new { mid = mid, actid = menu.ActivityID }, new { @style = "color: #377091;" })
-                                        </li>
-                                    }
+                                    var lst_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(menu.MenuID);
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="#" style="color: #377091;">@menu.MenuName</a>
+                                        <ul class="dropdown-menu">
+                                            @foreach (var sub_menu in lst_sub_menus)
+                                            {
+                                                <li style="color: #377091;">
+                                                    @Html.ActionLink(sub_menu.MenuName, sub_menu.ActionName, sub_menu.ControllerName, new { mid = mid, actid = sub_menu.ActivityID }, new { @style = "color: #377091;", @tabindex = "-1" })
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
                                 }
                                 else
                                 {
-                                    if (menu.MenuID == 8 || menu.MenuID == 4 || menu.MenuID == 7)
-                                    {
-                                        var lst_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(menu.MenuID);
-                                        <li class="dropdown-submenu">
-                                            <a tabindex="-1" href="#" style="color: #377091;">@menu.MenuName</a>
-                                            <ul class="dropdown-menu">
-                                                @foreach (var sub_menu in lst_sub_menus)
-                                                {
-                                                    <li style="color: #377091;">
-                                                        @Html.ActionLink(sub_menu.MenuName, sub_menu.ActionName, sub_menu.ControllerName, new { mid = mid }, new { @style = "color: #377091;", @tabindex = "-1" })
-                                                    </li>
-                                                }
-                                            </ul>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li style="color: #377091;">
-                                            @Html.ActionLink(menu.MenuName, menu.ActionName, menu.ControllerName, new { mid = mid }, new { @style = "color: #377091;" })
-                                        </li>
-                                    }
+                                    <li style="color: #377091;">
+                                        @Html.ActionLink(menu.MenuName, menu.ActionName, menu.ControllerName, new { mid = mid, actid = menu.ActivityID }, new { @style = "color: #377091;" })
+                                    </li>
                                 }
                             }
-                        </ul>
-                    }
-                </li>
+                            else
+                            {
+                                if (menu.MenuID == 8 || menu.MenuID == 4 || menu.MenuID == 7)
+                                {
+                                    var lst_sub_menus = administratorBusinessComponent.GetSubMenuByParentMenuID(menu.MenuID);
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="#" style="color: #377091;">@menu.MenuName</a>
+                                        <ul class="dropdown-menu">
+                                            @foreach (var sub_menu in lst_sub_menus)
+                                            {
+                                                <li style="color: #377091;">
+                                                    @Html.ActionLink(sub_menu.MenuName, sub_menu.ActionName, sub_menu.ControllerName, new { mid = mid }, new { @style = "color: #377091;", @tabindex = "-1" })
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li style="color: #377091;">
+                                        @Html.ActionLink(menu.MenuName, menu.ActionName, menu.ControllerName, new { mid = mid }, new { @style = "color: #377091;" })
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+                }
+            </li>
             }
         </ul>
     }

@@ -9,6 +9,7 @@ using MRTD.Core.Models;
 using MRTD.Core.Common;
 using MRTD.Core.Encryption;
 using MRTD.Core.Upload;
+using MRTD.Core.Notification;
 using BusinessSchoolMLS.SchoolBusinessComponent;
 using Microsoft.Extensions.Primitives;
 using iTextSharp.text.html.simpleparser;
@@ -335,6 +336,8 @@ namespace BusinessSchoolMLS.Controllers
                                                             Session.AppSession["ApplicationId"].ToString(),
                                                             (int)UploadLetter.LETTER_ACCEPTANCE_OF_LEARNER_OF_CODE_OF_CONDUCT_UPLOAD_ID
                                                          );
+                    ProcessNotification(documentVerifyModel.ApproverID, (int)ApplicationProgressStatus.LETTER_ACCEPTANCE_OF_LEARNER_OF_CODE_OF_CONDUCT, Guid.Parse(documentVerifyModel.ProspectiveID), Session.AppSession["ApplicationId"].ToString(), (int)UploadLetter.LETTER_ACCEPTANCE_OF_LEARNER_OF_CODE_OF_CONDUCT_UPLOAD_ID);
+
                 }
                 else if (Int32.Parse(documentVerifyModel.EnrollmentStatusID) == 11)
                 {
@@ -344,6 +347,7 @@ namespace BusinessSchoolMLS.Controllers
                                                             Session.AppSession["ApplicationId"].ToString(),
                                                             (int)UploadLetter.REGISTRATION_LETTER_UPLOAD_ID
                                                          );
+                    ProcessNotification(documentVerifyModel.ApproverID, (int)ApplicationProgressStatus.REGISTRATION_LETTER, Guid.Parse(documentVerifyModel.ProspectiveID), Session.AppSession["ApplicationId"].ToString(), (int)UploadLetter.REGISTRATION_LETTER_UPLOAD_ID);
                 }
                 else
                 {
@@ -352,6 +356,7 @@ namespace BusinessSchoolMLS.Controllers
                                                             Guid.Parse(documentVerifyModel.ProspectiveID),
                                                             Session.AppSession["ApplicationId"].ToString()
                                                          );
+                    ProcessNotification(documentVerifyModel.ApproverID, (int)ApplicationProgressStatus.PROOF_OF_PAYMENT, Guid.Parse(documentVerifyModel.ProspectiveID), Session.AppSession["ApplicationId"].ToString());
                 }
                 applicationBusinessComponent.UpdateEnrollmentStatusByMemberID(documentVerifyModel);
             }
@@ -359,9 +364,35 @@ namespace BusinessSchoolMLS.Controllers
             {
                 LogMessageBusinessComponent.InsertLogMessage(documentVerifyModel.ApproverID, MessageNode.SYS_APPLICATION_APPROVE_ENROLLMENT_ERROR, exception.ToString());
             }
-            return RedirectToAction("Prospective", "SchoolFaculty", new { mid = documentVerifyModel.ApproverID, sid= documentVerifyModel.ProspectiveID});
+            return RedirectToAction("ProspectiveStudent", "SchoolFaculty", new { mid = documentVerifyModel.ApproverID});
         }
 
+        private void ProcessNotification(string mid, int progressStatusId, Guid prospectiveId, string applicationId, int uploadTempleteId = 0)
+        {
+            try
+            {
+                NotificationBusinessComponent notificationBusinessComponent = new NotificationBusinessComponent();
+                var notificationModel = notificationBusinessComponent.GetNotificationByMemberId(progressStatusId, prospectiveId, applicationId);
+                MemberActivityModel memberActivityModel = new MemberActivityModel()
+                {
+                    EmailAddress = notificationModel.EmailAddress,
+                    EmailBody = notificationModel.MessageBody.Replace("#PASSWORD#", TippAcademyEncryptionEngine.Decrypt(notificationModel.Password, notificationModel.ApplicationId.ToString().ToUpper())),
+                    EmailSubject = notificationModel.MailSubject
+                };
+                if (notificationModel.AttachmentID != 0)//If there's an attachment.
+                {
+                    byte[] attachmentDocument = administratorBusinessComponent.GetRequiredDocumentByUploadID(notificationModel.AttachmentID);
+                    memberActivityModel.EmailAttachment = Convert.ToBase64String(attachmentDocument);
+                }
+                BusinessNotification.ProcessNotice(memberActivityModel, Session.AppSession["MailServer"].ToString(), Session.AppSession["Port"].ToString(), Session.AppSession["FromUsername"].ToString(),
+                                                   TippAcademyEncryptionEngine.Decrypt(Session.AppSession["FromPassword"].ToString(), 
+                                                   notificationModel.ApplicationId.ToString().ToUpper()), Session.AppSession["FromEmailHead"].ToString());
+            }
+            catch(Exception exception)
+            {
+                LogMessageBusinessComponent.InsertLogMessage(mid, MessageNode.SYS_PROCESS_NOTIFICATION_ERROR, exception.ToString());
+            }
+        }
 
         public IActionResult ModuleAllocation(string mid, string uid)
         {

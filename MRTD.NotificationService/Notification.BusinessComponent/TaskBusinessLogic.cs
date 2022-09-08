@@ -30,7 +30,9 @@ namespace MRTD.NotificationService.Notification.BusinessComponent
                 model.ApplicationParameter = new ApplicationSession();
                 model.ReturnType = DataReturnType.Fill;
                 model.ApplicationParameter.Set("ApplicationId", applicationId);
-                return (List<ApplicationFunctionalityModel>)CommonDataAccess.Process<ApplicationFunctionalityModel>(model);
+                var lstApplication = (List<ApplicationFunctionalityModel>)CommonDataAccess.Process<ApplicationFunctionalityModel>(model);
+
+                return lstApplication;
             }
             catch (Exception exception)
             {

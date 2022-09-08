@@ -13,20 +13,29 @@ using MRTD.Core.Models;
 using MRTD.NotificationService.Notification.BusinessComponent;
 using MRTD.NotificationService.TaskMessageQueue;
 using MRTD.Core.Encryption;
+using System.IO;
 
 namespace MRTD.NotificationService
 {
     public partial class NotificationService : ServiceBase
     {
-        private System.Timers.Timer tmrTaskNotification;
+        //private System.Timers.Timer tmrTaskNotification;
         private System.Timers.Timer tmrTaskNotificationFromTippConnect;
         private TaskBusinessLogic taskBusinessLogic = new TaskBusinessLogic(ConfigurationManager.AppSettings["ApplicationId"].ToString());
         public NotificationService()
         {
             InitializeComponent();
-            tmrTaskNotification = new System.Timers.Timer(5000);
+            //tmrTaskNotification = new System.Timers.Timer(5000);
             tmrTaskNotificationFromTippConnect = new System.Timers.Timer(1000);
             InitialiseApplication();
+        }
+
+        private void LogFile(string message)
+        {
+            using (StreamWriter stream = new StreamWriter(new FileStream(@"C:\Notification\Error.txt", FileMode.Create)))
+            {
+                stream.WriteLine(message);
+            }
         }
 
         private void InitialiseApplication()
@@ -53,11 +62,12 @@ namespace MRTD.NotificationService
             }
             catch(Exception exception)
             {
+                LogFile(exception.ToString());
                 LoggerBusinessComponent.InsertLogMessage(ConfigurationManager.AppSettings["ApplicationId"].ToString(), MessageNode.SYS_MRTD_NOTIFICATION_ERROR, exception.ToString());
             }
             
         }
-        private void tmrTaskNotification_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        /*private void tmrTaskNotification_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             try
             {
@@ -71,7 +81,7 @@ namespace MRTD.NotificationService
                 LoggerBusinessComponent.InsertLogMessage(ConfigurationManager.AppSettings["ApplicationId"].ToString(), MessageNode.SYS_MRTD_NOTIFICATION_ERROR, exception.ToString());
             }
         }
-
+        */
         protected void tmrTaskNotificationFromTippConnect_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             try
@@ -94,7 +104,7 @@ namespace MRTD.NotificationService
                         byte[] attachmentDocument = taskBusinessLogic.GetRequiredDocumentByUploadID(notificationModel.AttachmentID);
                         memberActivityModel.EmailAttachment = Convert.ToBase64String(attachmentDocument);
                     }
-                    TaskNotificationQueue.SendMessage(ConfigurationManager.AppSettings["tipp_server_msq"] + @"\" + notificationModel.MSQPath, memberActivityModel);
+                    TaskNotificationQueue.SendMessageFromQueue(memberActivityModel);
                 });
             }
             catch(Exception exception)
@@ -104,12 +114,12 @@ namespace MRTD.NotificationService
         }
         protected override void OnStart(string[] args)
         {
-            tmrTaskNotification.Enabled = false;
+            //tmrTaskNotification.Enabled = false;
             tmrTaskNotificationFromTippConnect.Enabled = false;
             try
             {
-                tmrTaskNotification.Elapsed += tmrTaskNotification_Elapsed;
-                tmrTaskNotification.Start();
+                //tmrTaskNotification.Elapsed += tmrTaskNotification_Elapsed;
+                //tmrTaskNotification.Start();
                 tmrTaskNotificationFromTippConnect.Elapsed += tmrTaskNotificationFromTippConnect_Elapsed;
                 tmrTaskNotificationFromTippConnect.Start();
             }
@@ -119,7 +129,7 @@ namespace MRTD.NotificationService
             }
             finally
             {
-                tmrTaskNotification.Enabled = true;
+                //tmrTaskNotification.Enabled = true;
                 tmrTaskNotificationFromTippConnect.Enabled = true;
             }
         }
@@ -128,8 +138,10 @@ namespace MRTD.NotificationService
             LoggerBusinessComponent.InsertLogMessage(ConfigurationManager.AppSettings["ApplicationId"].ToString(), MessageNode.SYS_MRTD_NOTIFICATION_END);
             try
             {
-                tmrTaskNotification.Enabled = false;
-                tmrTaskNotification.Stop();
+                //tmrTaskNotification.Enabled = false;
+                //tmrTaskNotification.Stop();
+                tmrTaskNotificationFromTippConnect.Enabled = false;
+                tmrTaskNotificationFromTippConnect.Stop();
             }
             catch(Exception exception)
             {
